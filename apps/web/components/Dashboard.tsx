@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import type { TimedEvent } from '@swarm/shared';
 import { useReplay } from '../lib/useReplay.ts';
@@ -116,9 +117,15 @@ export default function Dashboard({ timeline }: { timeline: TimedEvent[] }) {
 
       {finished && (
         <div className="banner">
-          The agent said “done.” The swarm found <b>{count}</b> ways real users would’ve hit a wall —
-          rating it <b>{state.run?.swarm_rating}/5</b>.{' '}
-          <span className="banner__note">(Report site — Epic 3 — coming next.)</span>
+          <span>
+            The agent said “done.” The swarm found <b>{count}</b> ways real users would’ve hit a wall —
+            rating it <b>{state.run?.swarm_rating}/5</b>.
+          </span>
+          {state.run && (
+            <Link href={`/r/${state.run.id}`} className="banner__cta">
+              View full report →
+            </Link>
+          )}
         </div>
       )}
     </div>

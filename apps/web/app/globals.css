@@ -164,3 +164,68 @@ html, body {
 
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .45; } }
 @keyframes scan { 0% { transform: translateY(-40px); } 100% { transform: translateY(150px); } }
+
+/* ---- banner CTA ---- */
+.banner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.banner__cta {
+  background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff;
+  text-decoration: none; font-weight: 700; padding: 10px 16px; border-radius: 10px; white-space: nowrap;
+  box-shadow: 0 6px 22px rgba(91,140,255,.35);
+}
+
+/* ---- stars ---- */
+.stars { letter-spacing: 1px; }
+.stars__on { color: #ffd60a; }
+.stars__off { color: #3a4258; }
+
+/* ---- report ---- */
+.report { max-width: 920px; margin: 0 auto; padding: 28px clamp(16px,3vw,28px) 80px; }
+.report__crumb { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.report__back { color: var(--accent); text-decoration: none; font-size: 14px; }
+.report__back:hover { text-decoration: underline; }
+.report__runid { color: var(--muted); font-size: 12px; font-family: ui-monospace, monospace; }
+.report h1 { font-size: 34px; margin: 0 0 6px; }
+.report__app { color: var(--muted); margin: 0 0 22px; }
+
+.report__verdict {
+  display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
+  background: linear-gradient(135deg, rgba(91,140,255,.12), rgba(155,91,255,.10));
+  border: 1px solid rgba(91,140,255,.35); border-radius: 18px; padding: 22px 26px;
+}
+.verdict__num { font-size: 52px; font-weight: 800; line-height: 1; }
+.verdict__num span { font-size: 22px; color: var(--muted); }
+.verdict__caption { color: var(--muted); font-size: 13px; margin-top: 6px; }
+.verdict__chips { display: flex; gap: 12px; margin-left: auto; flex-wrap: wrap; }
+.rchip { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 18px; min-width: 96px; }
+.rchip--accent { border-color: rgba(91,140,255,.5); }
+.rchip__value { font-size: 26px; font-weight: 800; }
+.rchip--accent .rchip__value { color: var(--accent); }
+.rchip__label { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+.report__sections { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
+.psection { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; }
+.psection__head { display: flex; align-items: center; gap: 12px; }
+.psection__emoji { font-size: 26px; }
+.psection__id { display: flex; flex-direction: column; gap: 4px; }
+.psection__name { font-weight: 700; font-size: 16px; }
+.psection__count { margin-left: auto; color: var(--muted); font-size: 13px; }
+.psection__review { margin: 14px 0 14px; padding-left: 14px; border-left: 3px solid var(--line); color: #c7cde0; font-style: italic; }
+.psection__clean { color: var(--good); font-size: 14px; padding: 6px 0; }
+
+.findings { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.rfinding { display: flex; gap: 12px; background: var(--bg2); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.rfinding__sev { width: 6px; border-radius: 6px; flex-shrink: 0; }
+.rfinding__main { flex: 1; min-width: 0; }
+.rfinding__top { display: flex; align-items: baseline; gap: 10px; }
+.rfinding__title { font-weight: 600; font-size: 14px; }
+.rfinding__sevtag { font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: .5px; margin-left: auto; }
+.rfinding__meta { display: flex; gap: 8px; margin: 6px 0; }
+.rfinding__edge, .rfinding__screen { font-size: 11px; color: var(--muted); background: var(--panel); border: 1px solid var(--line); padding: 1px 8px; border-radius: 20px; }
+.rfinding__repro { font-size: 12.5px; color: #aeb6cc; line-height: 1.45; }
+.rfinding__shot {
+  width: 84px; flex-shrink: 0; border-radius: 8px; border: 1px dashed var(--line);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  background: radial-gradient(60px 60px at 50% 40%, #1b2233, #0e1119); color: var(--muted); font-size: 10px; text-align: center; padding: 6px;
+}
+.rfinding__shot span { color: #cfd5e6; font-weight: 600; }
+.report__footer { margin-top: 30px; color: var(--muted); font-size: 12.5px; text-align: center; }
