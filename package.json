@@ -11,7 +11,8 @@
   ],
   "scripts": {
     "seed": "node packages/shared/scripts/seed.ts",
-    "test": "node --test 'packages/shared/test/*.test.ts'"
+    "test": "node --test 'packages/shared/test/*.test.ts'",
+    "test:all": "node --test 'packages/shared/test/*.test.ts' 'apps/web/lib/*.test.ts' 'agents/persona/test/*.test.ts' 'services/orchestrator/test/*.test.ts'"
   },
   "engines": {
     "node": ">=23.6"

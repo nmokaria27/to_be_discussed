@@ -1,0 +1,9 @@
+{
+  "name": "@swarm/persona",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Persona Agent + DriverAgent (C7) — autonomous exploratory tester.",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "test": "node --test 'test/*.test.ts'" }
+}

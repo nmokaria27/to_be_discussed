@@ -132,9 +132,9 @@ function buildPersona(rng: Rng, o: ResolvedOptions, spec: PersonaSpec, runId: st
   return { persona, simulator, findings };
 }
 
-function meanRating(personas: Persona[]): number {
+function meanRating(personas: Persona[]): number | null {
   const rated = personas.filter((p) => p.rating != null) as Array<Persona & { rating: number }>;
-  if (rated.length === 0) return 0;
+  if (rated.length === 0) return null; // contract: swarm_rating is null when nothing rated
   const sum = rated.reduce((a, p) => a + p.rating, 0);
   return Math.round((sum / rated.length) * 10) / 10;
 }

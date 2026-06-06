@@ -2,6 +2,11 @@ import { InsForgeWriter, generateSnapshot, generateTimeline } from '@swarm/share
 import type { RealtimeEvent, TimedEvent } from '@swarm/shared';
 
 export const dynamic = 'force-dynamic';
+// Streams rows over ~30s wall-clock — requires a persistent runtime (local
+// `next start` or a long-lived Node host). On frozen serverless the stream is
+// killed after the response; deploy this route to a Node server, or replace it
+// with Dev A's real orchestrator. maxDuration nudges platforms that honor it.
+export const maxDuration = 60;
 
 // Stand-in Orchestrator (contract C2). Until Dev A's real Replicas+lim.run
 // orchestrator lands, this streams a Fake Swarm run into InsForge over wall-clock
