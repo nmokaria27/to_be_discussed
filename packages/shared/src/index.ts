@@ -6,6 +6,8 @@ export * from './types.ts';
 export * from './personas.ts';
 export * from './edge-cases.ts';
 export * from './writer.ts';
+export * from './insforge-writer.ts';
+export * from './insforge-reader.ts';
 export * from './fake-swarm.ts';
 export { makeRng } from './rng.ts';
 export type { Rng } from './rng.ts';

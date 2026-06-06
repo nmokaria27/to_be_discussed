@@ -5,7 +5,8 @@
   "type": "module",
   "description": "Shared contracts (C1, C8), InsForge writer interface, and the Fake Swarm seeder (C9).",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./fixtures/*": "./fixtures/*"
   },
   "scripts": {
     "seed": "node scripts/seed.ts",
