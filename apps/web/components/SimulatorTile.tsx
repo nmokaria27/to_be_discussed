@@ -1,5 +1,6 @@
 'use client';
 
+import { motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import type { Persona, Simulator } from '@swarm/shared';
 import { personaEmoji } from '../lib/personaVisuals.ts';
@@ -31,7 +32,12 @@ export function SimulatorTile({
   const key = persona?.key ?? '';
 
   return (
-    <div className={`tile tile--${status} ${flash ? 'tile--flash' : ''}`}>
+    <motion.div
+      className={`tile tile--${status} ${flash ? 'tile--flash' : ''}`}
+      initial={{ opacity: 0, scale: 0.9, y: 8 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 320, damping: 26 }}
+    >
       <div className="tile__bar">
         <span className="tile__emoji">{personaEmoji(key)}</span>
         <span className="tile__name">{name}</span>
@@ -54,6 +60,6 @@ export function SimulatorTile({
           <div className="tile__bugs">🐛 {findingCount}</div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

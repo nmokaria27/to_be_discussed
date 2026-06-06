@@ -1,5 +1,6 @@
 'use client';
 
+import { AnimatePresence, motion } from 'motion/react';
 import type { FeedItem } from '../lib/runReducer.ts';
 import { personaEmoji, SEVERITY_COLOR } from '../lib/personaVisuals.ts';
 
@@ -18,10 +19,18 @@ export function FindingsFeed({
       </div>
       <div className="feed__list">
         {items.length === 0 && <div className="feed__empty">No findings yet…</div>}
+        <AnimatePresence initial={false}>
         {items.map((item) => {
           const p = personaOf(item.finding.persona_id);
           return (
-            <div key={item.groupKey} className="finding">
+            <motion.div
+              key={item.groupKey}
+              className="finding"
+              layout
+              initial={{ opacity: 0, x: 16 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+            >
               <span
                 className="finding__sev"
                 style={{ background: SEVERITY_COLOR[item.finding.severity] }}
@@ -37,9 +46,10 @@ export function FindingsFeed({
                   {item.count > 1 && <span className="finding__count">×{item.count}</span>}
                 </div>
               </div>
-            </div>
+            </motion.div>
           );
         })}
+        </AnimatePresence>
       </div>
     </aside>
   );

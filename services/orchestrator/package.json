@@ -1,0 +1,9 @@
+{
+  "name": "@swarm/orchestrator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Swarm run lifecycle (Epic 5) — provision, run agents, converge, teardown.",
+  "exports": { ".": "./src/orchestrator.ts" },
+  "scripts": { "test": "node --test 'test/*.test.ts'" }
+}

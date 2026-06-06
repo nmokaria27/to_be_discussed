@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "limrun-xcode-and-ios-simulator": {
+      "source": "limrun-inc/skills",
+      "sourceType": "github",
+      "skillPath": "skills/limrun-xcode-and-ios-simulator/SKILL.md",
+      "computedHash": "4a87f9f28b2c1f2358fbda5be225925a231482acc2f0a50a8c5b46a661d5d304"
+    }
+  }
+}

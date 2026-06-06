@@ -44,16 +44,28 @@ export function useInsforgeRun(runId: string | null): RunState {
         .catch((e) => console.error('initial hydrate failed', e));
     }
 
-    const onRun = (p: Run) => apply({ kind: 'run', run: p });
-    const onPersona = (p: Persona) => apply({ kind: 'persona', persona: p });
-    const onSimulator = (p: Simulator) => apply({ kind: 'simulator', simulator: p });
-    const onFinding = (p: Finding) => apply({ kind: 'finding', finding: p });
+    // InsForge delivers a SocketMessage: { meta, ...payload } (payload may be
+    // top-level passthrough or nested under .payload). Normalize to the row and
+    // strip meta before folding into the reducer.
+    const row = <T,>(msg: unknown): T => {
+      const m = (msg ?? {}) as Record<string, unknown>;
+      if (m.payload && typeof m.payload === 'object') return m.payload as T;
+      const { meta: _meta, ...rest } = m;
+      return rest as T;
+    };
+    const onRun = (p: unknown) => apply({ kind: 'run', run: row<Run>(p) });
+    const onPersona = (p: unknown) => apply({ kind: 'persona', persona: row<Persona>(p) });
+    const onSimulator = (p: unknown) => apply({ kind: 'simulator', simulator: row<Simulator>(p) });
+    const onFinding = (p: unknown) => apply({ kind: 'finding', finding: row<Finding>(p) });
 
     (async () => {
       try {
         await client.realtime.connect();
+        if (!alive) return;
         await client.realtime.subscribe(channels.status(runId));
+        if (!alive) return;
         await client.realtime.subscribe(channels.findings(runId));
+        if (!alive) return; // don't attach orphaned handlers after cleanup ran
         client.realtime.on('run', onRun);
         client.realtime.on('persona', onPersona);
         client.realtime.on('simulator', onSimulator);
