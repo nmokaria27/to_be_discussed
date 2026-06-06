@@ -14,3 +14,7 @@ out/
 .env.*.local
 *.tsbuildinfo
 .vercel
+
+# test/verification artifacts
+.playwright-mcp/
+next-env.d.ts
