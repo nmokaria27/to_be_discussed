@@ -1,0 +1,14 @@
+{
+  "name": "@swarm/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared contracts (C1, C8), InsForge writer interface, and the Fake Swarm seeder (C9).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "seed": "node scripts/seed.ts",
+    "test": "node --test 'test/*.test.ts'"
+  }
+}

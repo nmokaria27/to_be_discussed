@@ -1,0 +1,16 @@
+# bmad tooling — each dev brings their own bmad install; the OUTPUTS are handed off
+_bmad/
+.claude/
+
+# node / build
+node_modules/
+dist/
+.next/
+out/
+*.log
+.DS_Store
+.env
+.env.local
+.env.*.local
+*.tsbuildinfo
+.vercel

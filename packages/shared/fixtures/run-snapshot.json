@@ -1,0 +1,551 @@
+{
+  "run": {
+    "id": "run_00199e1ef7b",
+    "app_id": "notes-demo",
+    "status": "converged",
+    "swarm_size": 12,
+    "swarm_rating": 3,
+    "started_at": "2026-06-06T17:00:00.000Z",
+    "converged_at": "2026-06-06T17:01:20.000Z"
+  },
+  "personas": [
+    {
+      "id": "persona_00272c32b89",
+      "run_id": "run_00199e1ef7b",
+      "key": "rage_tapper",
+      "display_name": "Rage-Tapper",
+      "target_edge_cases": [
+        "rapid_tap",
+        "overflow"
+      ],
+      "status": "done",
+      "rating": 4,
+      "review_text": "Mostly responsive, but 2 spot(s) double-fired under fast taps."
+    },
+    {
+      "id": "persona_007e1ce9b92",
+      "run_id": "run_00199e1ef7b",
+      "key": "offline_commuter",
+      "display_name": "Offline Commuter",
+      "target_edge_cases": [
+        "offline",
+        "slow_network"
+      ],
+      "status": "done",
+      "rating": 3,
+      "review_text": "Survives offline mostly; 1 rough edge(s) when the network dropped."
+    },
+    {
+      "id": "persona_01100fbda08",
+      "run_id": "run_00199e1ef7b",
+      "key": "power_user_10k",
+      "display_name": "10k-Item Power User",
+      "target_edge_cases": [
+        "large_data",
+        "overflow"
+      ],
+      "status": "done",
+      "rating": 2,
+      "review_text": "Buckles under real data — 3 slowdown(s)/breakage(s) with a large list."
+    },
+    {
+      "id": "persona_017d7ba68b2",
+      "run_id": "run_00199e1ef7b",
+      "key": "long_name_rtl",
+      "display_name": "Long-Name / RTL User",
+      "target_edge_cases": [
+        "long_name_rtl",
+        "overflow"
+      ],
+      "status": "done",
+      "rating": 2,
+      "review_text": "Text handling is broken — 3 clip/overlap issue(s) with long or RTL text."
+    },
+    {
+      "id": "persona_023bd164a4f",
+      "run_id": "run_00199e1ef7b",
+      "key": "accessibility",
+      "display_name": "Accessibility User",
+      "target_edge_cases": [
+        "accessibility"
+      ],
+      "status": "done",
+      "rating": 3,
+      "review_text": "Usable with 2 accessibility gap(s) to fix."
+    },
+    {
+      "id": "persona_028ed86ea6b",
+      "run_id": "run_00199e1ef7b",
+      "key": "tiny_screen",
+      "display_name": "Tiny-Screen User",
+      "target_edge_cases": [
+        "tiny_screen",
+        "overflow"
+      ],
+      "status": "done",
+      "rating": 2,
+      "review_text": "Cramped — 3 control(s) overlapped or ran off the small screen."
+    },
+    {
+      "id": "persona_034b8379354",
+      "run_id": "run_00199e1ef7b",
+      "key": "slow_network",
+      "display_name": "Slow-Network User",
+      "target_edge_cases": [
+        "slow_network"
+      ],
+      "status": "done",
+      "rating": 4,
+      "review_text": "Tolerable on slow data; 1 missing loading state(s)."
+    },
+    {
+      "id": "persona_0381edf27a6",
+      "run_id": "run_00199e1ef7b",
+      "key": "empty_state",
+      "display_name": "Empty-State Explorer",
+      "target_edge_cases": [
+        "empty_state"
+      ],
+      "status": "done",
+      "rating": 2,
+      "review_text": "Bad first impression — 2 blank/crashing empty screen(s) on first run."
+    },
+    {
+      "id": "persona_0434b92cbc2",
+      "run_id": "run_00199e1ef7b",
+      "key": "permission_denier",
+      "display_name": "Permission Denier",
+      "target_edge_cases": [
+        "auth_expiry",
+        "empty_state"
+      ],
+      "status": "done",
+      "rating": 1,
+      "review_text": "Breaks when I say no — 3 dead-end(s) after denying permissions."
+    },
+    {
+      "id": "persona_049e79f5dd8",
+      "run_id": "run_00199e1ef7b",
+      "key": "background_resume",
+      "display_name": "Background / Resume User",
+      "target_edge_cases": [
+        "auth_expiry"
+      ],
+      "status": "done",
+      "rating": 3,
+      "review_text": "Resumes okay with 1 state issue(s)."
+    },
+    {
+      "id": "persona_053b59d2e85",
+      "run_id": "run_00199e1ef7b",
+      "key": "deep_link",
+      "display_name": "Deep-Link Visitor",
+      "target_edge_cases": [
+        "empty_state",
+        "auth_expiry"
+      ],
+      "status": "done",
+      "rating": 5,
+      "review_text": "Deep links landed me exactly where expected."
+    },
+    {
+      "id": "persona_05629d709aa",
+      "run_id": "run_00199e1ef7b",
+      "key": "rapid_switcher",
+      "display_name": "Rapid Switcher",
+      "target_edge_cases": [
+        "rapid_tap",
+        "slow_network"
+      ],
+      "status": "done",
+      "rating": 5,
+      "review_text": "Fast screen switching never left stale or overlapping views."
+    }
+  ],
+  "simulators": [
+    {
+      "id": "sim_003da3b32bf",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_00272c32b89",
+      "lim_handle": "lim_0063ffb0078",
+      "stream_url": "https://lim.run/stream/sim_003da3b32bf",
+      "status": "live"
+    },
+    {
+      "id": "sim_008bee8a834",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_007e1ce9b92",
+      "lim_handle": "lim_0109c51a6b4",
+      "stream_url": "https://lim.run/stream/sim_008bee8a834",
+      "status": "live"
+    },
+    {
+      "id": "sim_01278852a05",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_01100fbda08",
+      "lim_handle": "lim_0162c4a122f",
+      "stream_url": "https://lim.run/stream/sim_01278852a05",
+      "status": "live"
+    },
+    {
+      "id": "sim_0187cdc85f1",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_017d7ba68b2",
+      "lim_handle": "lim_0224dbaabf5",
+      "stream_url": "https://lim.run/stream/sim_0187cdc85f1",
+      "status": "live"
+    },
+    {
+      "id": "sim_024dbd47a92",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_023bd164a4f",
+      "lim_handle": "lim_027b16e3909",
+      "stream_url": "https://lim.run/stream/sim_024dbd47a92",
+      "status": "live"
+    },
+    {
+      "id": "sim_02916851290",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_028ed86ea6b",
+      "lim_handle": "lim_03313dc70c6",
+      "stream_url": "https://lim.run/stream/sim_02916851290",
+      "status": "live"
+    },
+    {
+      "id": "sim_035ef537dde",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_034b8379354",
+      "lim_handle": "lim_037d2677f8d",
+      "stream_url": "https://lim.run/stream/sim_035ef537dde",
+      "status": "live"
+    },
+    {
+      "id": "sim_039fee22c6f",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_0381edf27a6",
+      "lim_handle": "lim_042babae013",
+      "stream_url": "https://lim.run/stream/sim_039fee22c6f",
+      "status": "live"
+    },
+    {
+      "id": "sim_0447323a693",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_0434b92cbc2",
+      "lim_handle": "lim_048c9338873",
+      "stream_url": "https://lim.run/stream/sim_0447323a693",
+      "status": "live"
+    },
+    {
+      "id": "sim_05017f8e11a",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_049e79f5dd8",
+      "lim_handle": "lim_0522dab48db",
+      "stream_url": "https://lim.run/stream/sim_05017f8e11a",
+      "status": "live"
+    },
+    {
+      "id": "sim_054b31ef6e4",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_053b59d2e85",
+      "lim_handle": "lim_05569b151a6",
+      "stream_url": "https://lim.run/stream/sim_054b31ef6e4",
+      "status": "live"
+    },
+    {
+      "id": "sim_057a798376b",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_05629d709aa",
+      "lim_handle": "lim_059538d8198",
+      "stream_url": "https://lim.run/stream/sim_057a798376b",
+      "status": "live"
+    }
+  ],
+  "findings": [
+    {
+      "id": "finding_00445f24513",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_00272c32b89",
+      "simulator_id": "sim_003da3b32bf",
+      "edge_case": "rapid_tap",
+      "severity": "low",
+      "title": "Rapid Save taps stack multiple save toasts",
+      "repro_steps": "Tap Save repeatedly → several overlapping toasts appear.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_00445f24513.png",
+      "screen_key": "rage_tapper:rapid_tap:NoteDetail",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_00578e9c540",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_00272c32b89",
+      "simulator_id": "sim_003da3b32bf",
+      "edge_case": "overflow",
+      "severity": "medium",
+      "title": "Row content overflows its container",
+      "repro_steps": "Add a note with a long preview → text bleeds past the card edge.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_00578e9c540.png",
+      "screen_key": "rage_tapper:overflow:NoteList",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_009afc5ce21",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_007e1ce9b92",
+      "simulator_id": "sim_008bee8a834",
+      "edge_case": "offline",
+      "severity": "critical",
+      "title": "Edits silently lost when saving offline",
+      "repro_steps": "Go offline → edit a note → Save → edit discarded with no warning.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_009afc5ce21.png",
+      "screen_key": "offline_commuter:offline:NoteDetail",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_0130812df17",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_01100fbda08",
+      "simulator_id": "sim_01278852a05",
+      "edge_case": "large_data",
+      "severity": "high",
+      "title": "Search freezes the UI on large datasets",
+      "repro_steps": "With 10k notes → type in search → UI frozen for several seconds.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_0130812df17.png",
+      "screen_key": "power_user_10k:large_data:Search",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_0142f895094",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_01100fbda08",
+      "simulator_id": "sim_01278852a05",
+      "edge_case": "large_data",
+      "severity": "high",
+      "title": "List stutters badly with 10k notes",
+      "repro_steps": "Seed 10,000 notes → scroll → frame drops and jank.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_0142f895094.png",
+      "screen_key": "power_user_10k:large_data:NoteList",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_01506f192a6",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_01100fbda08",
+      "simulator_id": "sim_01278852a05",
+      "edge_case": "overflow",
+      "severity": "medium",
+      "title": "Row content overflows its container",
+      "repro_steps": "Add a note with a long preview → text bleeds past the card edge.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_01506f192a6.png",
+      "screen_key": "power_user_10k:overflow:NoteList",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_01909959dc5",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_017d7ba68b2",
+      "simulator_id": "sim_0187cdc85f1",
+      "edge_case": "long_name_rtl",
+      "severity": "medium",
+      "title": "Title clipped at 40 chars with no ellipsis",
+      "repro_steps": "Create a note titled with 200 characters → title is hard-cut mid-word.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_01909959dc5.png",
+      "screen_key": "long_name_rtl:long_name_rtl:NoteList",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_02098c343ed",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_017d7ba68b2",
+      "simulator_id": "sim_0187cdc85f1",
+      "edge_case": "long_name_rtl",
+      "severity": "high",
+      "title": "RTL text renders left-aligned and mis-ordered",
+      "repro_steps": "Enter an Arabic title → alignment and punctuation order are wrong.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_02098c343ed.png",
+      "screen_key": "long_name_rtl:long_name_rtl:NoteDetail",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_02135a27ab8",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_017d7ba68b2",
+      "simulator_id": "sim_0187cdc85f1",
+      "edge_case": "long_name_rtl",
+      "severity": "high",
+      "title": "RTL text renders left-aligned and mis-ordered",
+      "repro_steps": "Enter an Arabic title → alignment and punctuation order are wrong.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_02135a27ab8.png",
+      "screen_key": "long_name_rtl:long_name_rtl:NoteDetail",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_0254b017ffa",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_023bd164a4f",
+      "simulator_id": "sim_024dbd47a92",
+      "edge_case": "accessibility",
+      "severity": "high",
+      "title": "Icon buttons missing accessibility labels",
+      "repro_steps": "Enable VoiceOver → toolbar icons announce as \"button\" with no name.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_0254b017ffa.png",
+      "screen_key": "accessibility:accessibility:NoteList",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_026ae46df6b",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_023bd164a4f",
+      "simulator_id": "sim_024dbd47a92",
+      "edge_case": "accessibility",
+      "severity": "medium",
+      "title": "Placeholder text fails contrast at large text size",
+      "repro_steps": "Set largest text size → placeholder is unreadable on the background.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_026ae46df6b.png",
+      "screen_key": "accessibility:accessibility:NoteDetail",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_0302325fd0a",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_028ed86ea6b",
+      "simulator_id": "sim_02916851290",
+      "edge_case": "tiny_screen",
+      "severity": "medium",
+      "title": "FAB overlaps the last list row",
+      "repro_steps": "Smallest device → scroll to bottom → add button covers the last note.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_0302325fd0a.png",
+      "screen_key": "tiny_screen:tiny_screen:NoteList",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_0315c462b20",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_028ed86ea6b",
+      "simulator_id": "sim_02916851290",
+      "edge_case": "tiny_screen",
+      "severity": "high",
+      "title": "Toolbar controls run off the smallest screen",
+      "repro_steps": "On the smallest device → open a note → rightmost control is cut off.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_0315c462b20.png",
+      "screen_key": "tiny_screen:tiny_screen:NoteDetail",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_032e6496e6b",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_028ed86ea6b",
+      "simulator_id": "sim_02916851290",
+      "edge_case": "tiny_screen",
+      "severity": "medium",
+      "title": "FAB overlaps the last list row",
+      "repro_steps": "Smallest device → scroll to bottom → add button covers the last note.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_032e6496e6b.png",
+      "screen_key": "tiny_screen:tiny_screen:NoteList",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_036853373db",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_034b8379354",
+      "simulator_id": "sim_035ef537dde",
+      "edge_case": "slow_network",
+      "severity": "medium",
+      "title": "No loading indicator on slow network",
+      "repro_steps": "Throttle to 2G → open app → blank list for 8s with no spinner.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_036853373db.png",
+      "screen_key": "slow_network:slow_network:NoteList",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_04094157f54",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_0381edf27a6",
+      "simulator_id": "sim_039fee22c6f",
+      "edge_case": "empty_state",
+      "severity": "high",
+      "title": "Blank screen with no guidance on first launch",
+      "repro_steps": "Fresh install → open app → land on an empty white list with no message or CTA.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_04094157f54.png",
+      "screen_key": "empty_state:empty_state:NoteList",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_04152ad5caf",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_0381edf27a6",
+      "simulator_id": "sim_039fee22c6f",
+      "edge_case": "empty_state",
+      "severity": "critical",
+      "title": "App crashes when opening an empty list",
+      "repro_steps": "Fresh install → tap All Notes before creating any note → crash.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_04152ad5caf.png",
+      "screen_key": "empty_state:empty_state:NoteList",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_045e3e40650",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_0434b92cbc2",
+      "simulator_id": "sim_0447323a693",
+      "edge_case": "empty_state",
+      "severity": "critical",
+      "title": "App crashes when opening an empty list",
+      "repro_steps": "Fresh install → tap All Notes before creating any note → crash.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_045e3e40650.png",
+      "screen_key": "permission_denier:empty_state:NoteList",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_0464bc20965",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_0434b92cbc2",
+      "simulator_id": "sim_0447323a693",
+      "edge_case": "auth_expiry",
+      "severity": "high",
+      "title": "Stuck on blank screen after token expiry",
+      "repro_steps": "Background for 30 min → resume → blank screen, no recovery.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_0464bc20965.png",
+      "screen_key": "permission_denier:auth_expiry:Sync",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_0475034cbc8",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_0434b92cbc2",
+      "simulator_id": "sim_0447323a693",
+      "edge_case": "auth_expiry",
+      "severity": "high",
+      "title": "Stuck on blank screen after token expiry",
+      "repro_steps": "Background for 30 min → resume → blank screen, no recovery.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_0475034cbc8.png",
+      "screen_key": "permission_denier:auth_expiry:Sync",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_051f905e8bd",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_049e79f5dd8",
+      "simulator_id": "sim_05017f8e11a",
+      "edge_case": "auth_expiry",
+      "severity": "critical",
+      "title": "Expired session shows raw error instead of re-login",
+      "repro_steps": "Let session expire → resume app → raw 401 text shown, no re-auth flow.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_051f905e8bd.png",
+      "screen_key": "background_resume:auth_expiry:NoteList",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    },
+    {
+      "id": "finding_058e30a7e4d",
+      "run_id": "run_00199e1ef7b",
+      "persona_id": "persona_05629d709aa",
+      "simulator_id": "sim_057a798376b",
+      "edge_case": "rapid_tap",
+      "severity": "low",
+      "title": "Rapid Save taps stack multiple save toasts",
+      "repro_steps": "Tap Save repeatedly → several overlapping toasts appear.",
+      "screenshot_url": "insforge://findings/run_00199e1ef7b/finding_058e30a7e4d.png",
+      "screen_key": "rapid_switcher:rapid_tap:NoteDetail",
+      "created_at": "2026-06-06T17:00:00.000Z"
+    }
+  ]
+}

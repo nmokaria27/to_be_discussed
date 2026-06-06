@@ -1,0 +1,19 @@
+{
+  "name": "ai-beta-tester-swarm",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The AI Beta-Tester Swarm — persona-diverse agents beta-test mobile apps on parallel cloud simulators.",
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "services/*",
+    "agents/*"
+  ],
+  "scripts": {
+    "seed": "node packages/shared/scripts/seed.ts",
+    "test": "node --test 'packages/shared/test/*.test.ts'"
+  },
+  "engines": {
+    "node": ">=23.6"
+  }
+}
