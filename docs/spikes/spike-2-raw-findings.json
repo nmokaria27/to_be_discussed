@@ -1,0 +1,207 @@
+{
+  "instance_id": "ios_uswb_01ktfjj17jfzer4jc1vgnqkc36",
+  "iterations": [
+    {
+      "i": 1,
+      "tree_ms": 764,
+      "screenshot_ms": 577,
+      "tap_ms": 887,
+      "wall_s": 3.23,
+      "screen_signature": "children:Fitness|Watch|Contacts|Files|Preview|Utilities folder|Expo Go|Search",
+      "tree_root_label": "",
+      "tappable_count": 10,
+      "screenshot_bytes": 78672,
+      "screenshot_is_jpeg": true,
+      "tapped": {
+        "AXLabel": "Watch",
+        "AXUniqueId": "Watch"
+      }
+    },
+    {
+      "i": 2,
+      "tree_ms": 641,
+      "screenshot_ms": 509,
+      "tap_ms": 768,
+      "wall_s": 2.92,
+      "screen_signature": "children:\u201cWatch\u201d Would Like to Send You Notifications|Notifications may include alerts, sounds, and icon badges. These can be configured in Settings.|Don\u2019t Allow|Allow",
+      "tree_root_label": "",
+      "tappable_count": 4,
+      "screenshot_bytes": 58267,
+      "screenshot_is_jpeg": true,
+      "tapped": {
+        "AXLabel": "\u201cWatch\u201d Would Like to Send You Notifications",
+        "AXUniqueId": null
+      }
+    },
+    {
+      "i": 3,
+      "tree_ms": 688,
+      "screenshot_ms": 507,
+      "tap_ms": 719,
+      "wall_s": 2.91,
+      "screen_signature": "children:\u201cWatch\u201d Would Like to Send You Notifications|Notifications may include alerts, sounds, and icon badges. These can be configured in Settings.|Don\u2019t Allow|Allow",
+      "tree_root_label": "",
+      "tappable_count": 4,
+      "screenshot_bytes": 58223,
+      "screenshot_is_jpeg": true,
+      "tapped": {
+        "AXLabel": "Allow",
+        "AXUniqueId": null
+      }
+    },
+    {
+      "i": 4,
+      "tree_ms": 647,
+      "screenshot_ms": 597,
+      "tap_ms": 1048,
+      "wall_s": 3.29,
+      "screen_signature": "root:Watch",
+      "tree_root_label": "Watch",
+      "tappable_count": 7,
+      "screenshot_bytes": 51247,
+      "screenshot_is_jpeg": true,
+      "tapped": {
+        "AXLabel": "OK",
+        "AXUniqueId": null
+      }
+    },
+    {
+      "i": 5,
+      "tree_ms": 748,
+      "screenshot_ms": 529,
+      "tap_ms": 839,
+      "wall_s": 3.12,
+      "screen_signature": "children:Fitness|Watch|Contacts|Files|Preview|Utilities folder|Expo Go|Search",
+      "tree_root_label": "",
+      "tappable_count": 10,
+      "screenshot_bytes": 78680,
+      "screenshot_is_jpeg": true,
+      "tapped": {
+        "AXLabel": "Files",
+        "AXUniqueId": "Files"
+      }
+    },
+    {
+      "i": 6,
+      "tree_ms": 1261,
+      "screenshot_ms": 491,
+      "tap_ms": 884,
+      "wall_s": 3.64,
+      "screen_signature": "root:Files",
+      "tree_root_label": "Files",
+      "tappable_count": 6,
+      "screenshot_bytes": 26233,
+      "screenshot_is_jpeg": true,
+      "tapped": {
+        "AXLabel": "Tab Bar",
+        "AXUniqueId": "DOC.browsingModeTabBar"
+      }
+    },
+    {
+      "i": 7,
+      "tree_ms": 761,
+      "screenshot_ms": 496,
+      "tap_ms": 900,
+      "wall_s": 3.16,
+      "screen_signature": "root:Files",
+      "tree_root_label": "Files",
+      "tappable_count": 6,
+      "screenshot_bytes": 25610,
+      "screenshot_is_jpeg": true,
+      "tapped": {
+        "AXLabel": "Shared files will appear here.",
+        "AXUniqueId": null
+      }
+    },
+    {
+      "i": 8,
+      "tree_ms": 766,
+      "screenshot_ms": 487,
+      "tap_ms": 734,
+      "wall_s": 2.99,
+      "screen_signature": "root:Files",
+      "tree_root_label": "Files",
+      "tappable_count": 6,
+      "screenshot_bytes": 25651,
+      "screenshot_is_jpeg": true,
+      "tapped": {
+        "AXLabel": "4:00\u202fPM",
+        "AXUniqueId": null
+      },
+      "tap_error": "Error Domain=SimulatorError Code=-1 \"Accessibility selector matched 2 elements; expected exactly 1\""
+    },
+    {
+      "i": 9,
+      "tree_ms": 761,
+      "screenshot_ms": 503,
+      "tap_ms": 782,
+      "wall_s": 3.05,
+      "screen_signature": "root:Files",
+      "tree_root_label": "Files",
+      "tappable_count": 6,
+      "screenshot_bytes": 25651,
+      "screenshot_is_jpeg": true,
+      "tapped": {
+        "AXLabel": "Files",
+        "AXUniqueId": null
+      },
+      "tap_error": "Error Domain=com.facebook.FBSimulatorControl Code=0 \"No translation object returned for simulator.\""
+    },
+    {
+      "i": 10,
+      "tree_ms": 753,
+      "screenshot_ms": 489,
+      "tap_ms": 846,
+      "wall_s": 3.09,
+      "screen_signature": "root:Files",
+      "tree_root_label": "Files",
+      "tappable_count": 6,
+      "screenshot_bytes": 25651,
+      "screenshot_is_jpeg": true,
+      "tapped": {
+        "AXLabel": "No Shared Files",
+        "AXUniqueId": null
+      }
+    }
+  ],
+  "distinct_screens": [
+    {
+      "iteration_first_seen": 1,
+      "signature": "children:Fitness|Watch|Contacts|Files|Preview|Utilities folder|Expo Go|Search"
+    },
+    {
+      "iteration_first_seen": 2,
+      "signature": "children:\u201cWatch\u201d Would Like to Send You Notifications|Notifications may include alerts, sounds, and icon badges. These can be configured in Settings.|Don\u2019t Allow|Allow"
+    },
+    {
+      "iteration_first_seen": 4,
+      "signature": "root:Watch"
+    },
+    {
+      "iteration_first_seen": 6,
+      "signature": "root:Files"
+    }
+  ],
+  "anomalies": [
+    {
+      "i": 8,
+      "type": "tap_failed",
+      "label": "4:00\u202fPM",
+      "err": "SimulatorError Code=-1: Accessibility selector matched 2 elements; expected exactly 1"
+    },
+    {
+      "i": 9,
+      "type": "tap_failed",
+      "label": "Files",
+      "err": "FBSimulatorControl Code=0: No translation object returned for simulator"
+    }
+  ],
+  "summary": {
+    "iterations_completed": 10,
+    "distinct_screen_count": 4,
+    "avg_wall_s": 3.14,
+    "max_wall_s": 3.64,
+    "min_wall_s": 2.91,
+    "anomaly_count": 2
+  }
+}

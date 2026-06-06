@@ -1,0 +1,59 @@
+{
+  "timestamp": "2026-06-06T22:34:43Z",
+  "wall_clock_seconds": 2.16,
+  "target_count": 6,
+  "success_count": 6,
+  "failure_count": 0,
+  "all_states_ready": true,
+  "all_streams_valid": true,
+  "simulators": [
+    {
+      "persona": "rage-tapper",
+      "success": true,
+      "id": "ios_uswb_01ktfh60bffqf93y0h476dnfex",
+      "stream_url": "https://console.limrun.com/signedStream?token=<redacted>&url=wss%3A%2F%2Fus-fre1-m38-27a7.limrun.net%2Fv1%2Fios_uswb_01ktfh60bffqf93y0h476dnfex%2FendpointWebSocket",
+      "state": "ready",
+      "elapsed": 1.8680691719055176
+    },
+    {
+      "persona": "offline-commuter",
+      "success": true,
+      "id": "ios_uswb_01ktfh60fcfzetyjg7qsyaqdhg",
+      "stream_url": "https://console.limrun.com/signedStream?token=<redacted>&url=wss%3A%2F%2Fus-fre1-m24-e0e9.limrun.net%2Fv1%2Fios_uswb_01ktfh60fcfzetyjg7qsyaqdhg%2FendpointWebSocket",
+      "state": "ready",
+      "elapsed": 1.9363808631896973
+    },
+    {
+      "persona": "power-user",
+      "success": true,
+      "id": "ios_uswb_01ktfh60cmendtsacdf8fyrw9e",
+      "stream_url": "https://console.limrun.com/signedStream?token=<redacted>&url=wss%3A%2F%2Fus-fre1-m16-b555.limrun.net%2Fv1%2Fios_uswb_01ktfh60cmendtsacdf8fyrw9e%2FendpointWebSocket",
+      "state": "ready",
+      "elapsed": 1.9352481365203857
+    },
+    {
+      "persona": "text-edge",
+      "success": true,
+      "id": "ios_uswb_01ktfh60hxendsjfncwk3t62kq",
+      "stream_url": "https://console.limrun.com/signedStream?token=<redacted>&url=wss%3A%2F%2Fus-fre1-m40-3c70.limrun.net%2Fv1%2Fios_uswb_01ktfh60hxendsjfncwk3t62kq%2FendpointWebSocket",
+      "state": "ready",
+      "elapsed": 2.1595592498779297
+    },
+    {
+      "persona": "accessibility",
+      "success": true,
+      "id": "ios_uswb_01ktfh60kpfzevdayrsrphwxnn",
+      "stream_url": "https://console.limrun.com/signedStream?token=<redacted>&url=wss%3A%2F%2Fus-fre1-m8-e7d4.limrun.net%2Fv1%2Fios_uswb_01ktfh60kpfzevdayrsrphwxnn%2FendpointWebSocket",
+      "state": "ready",
+      "elapsed": 2.1582961082458496
+    },
+    {
+      "persona": "tiny-screen",
+      "success": true,
+      "id": "ios_uswb_01ktfh60kpfqfbfqmkjv78z43h",
+      "stream_url": "https://console.limrun.com/signedStream?token=<redacted>&url=wss%3A%2F%2Fus-fre1-m21-042f.limrun.net%2Fv1%2Fios_uswb_01ktfh60kpfqfbfqmkjv78z43h%2FendpointWebSocket",
+      "state": "ready",
+      "elapsed": 2.1569321155548096
+    }
+  ]
+}
