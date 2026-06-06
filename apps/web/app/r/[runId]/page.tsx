@@ -1,14 +1,28 @@
 import Link from 'next/link';
 import type { RunSnapshot } from '@swarm/shared';
+import { insforgeConfigFromEnv, loadRunSnapshot } from '@swarm/shared';
 import snapshotJson from '@swarm/shared/fixtures/run-snapshot.json';
 import { personaSections, reportSummary } from '../../../lib/report.ts';
 import { personaEmoji, SEVERITY_COLOR } from '../../../lib/personaVisuals.ts';
 import { Stars } from '../../../components/Stars.tsx';
 
-// Epic 3 reads a converged run (C6). In Fake Swarm mode this is the seeded
-// snapshot; with the real backend, fetch the run by id from InsForge instead —
-// the report-shaping (lib/report.ts) and this markup are unchanged.
-const snapshot = snapshotJson as unknown as RunSnapshot;
+const fixtureSnapshot = snapshotJson as unknown as RunSnapshot;
+
+// Epic 3 reads a converged run (C6). Reads from InsForge when configured
+// (NEXT_PUBLIC_DATA_SOURCE=insforge); otherwise (or on miss) falls back to the
+// Fake Swarm fixture. The report-shaping + markup are identical either way.
+async function getSnapshot(runId: string): Promise<{ snapshot: RunSnapshot; source: string }> {
+  const cfg = insforgeConfigFromEnv(process.env);
+  if (process.env.NEXT_PUBLIC_DATA_SOURCE === 'insforge' && cfg) {
+    try {
+      const live = await loadRunSnapshot(cfg, runId);
+      if (live) return { snapshot: live, source: 'insforge' };
+    } catch (err) {
+      console.error('InsForge read failed, falling back to fixture:', err);
+    }
+  }
+  return { snapshot: fixtureSnapshot, source: 'fixture' };
+}
 
 function screenOf(screenKey: string | null, edge: string): string {
   if (!screenKey) return edge;
@@ -18,6 +32,7 @@ function screenOf(screenKey: string | null, edge: string): string {
 
 export default async function ReportPage({ params }: { params: Promise<{ runId: string }> }) {
   const { runId } = await params;
+  const { snapshot, source } = await getSnapshot(runId);
   const summary = reportSummary(snapshot);
   const sections = personaSections(snapshot);
 
@@ -26,7 +41,7 @@ export default async function ReportPage({ params }: { params: Promise<{ runId: 
       <header className="report__hero">
         <div className="report__crumb">
           <Link href="/" className="report__back">← Dashboard</Link>
-          <span className="report__runid">run {runId}</span>
+          <span className="report__runid">run {summary.runId} · {source === 'insforge' ? 'live · InsForge' : 'fixture'}</span>
         </div>
         <h1>Beta-Test Report</h1>
         <p className="report__app">

@@ -18,6 +18,21 @@ npm test          # run @swarm/shared contract tests
 npm run seed      # regenerate Fake Swarm fixtures (deterministic)
 ```
 
+## Run the web app
+```bash
+cd apps/web && npm install && npm run dev   # http://localhost:3000
+```
+- **Fixture mode (default, no backend):** the dashboard replays the local Fake Swarm timeline; the report reads the seeded snapshot. Works offline.
+- **Live mode (InsForge):** copy `apps/web/.env.example` → `apps/web/.env.local` and fill creds from the InsForge dashboard (Install → Direct Connect → API Keys). Set `NEXT_PUBLIC_DATA_SOURCE=insforge`. Then **Unleash Swarm** calls `POST /api/runs` (the stand-in Orchestrator, contract C2), which streams a run into InsForge; the dashboard renders it live over InsForge **realtime** (C5), and the report reads it back (C6).
+
+### InsForge backend
+- Schema lives in `migrations/` (applied with `npx @insforge/cli db migrations up --all`) and mirrors `packages/shared/sql/schema.sql` (C1) plus realtime channels + publish triggers (C5).
+- `InsForgeWriter` (`packages/shared/src/insforge-writer.ts`) is the real `SwarmWriter`; seed a live converged run with:
+  ```bash
+  node --env-file=.env packages/shared/scripts/seed-insforge.ts
+  ```
+- Credentials are never committed: app reads `apps/web/.env.local`, CLI reads `.insforge/project.json` (both gitignored).
+
 ## Workspace map
 ```
 packages/shared/      @swarm/shared — contracts (C1,C5,C8), writer seam, Fake Swarm (C9)  [Claude]

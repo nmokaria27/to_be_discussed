@@ -16,6 +16,7 @@ import type {
   Persona,
   RealtimeEvent,
   Run,
+  RunSnapshot,
   Severity,
   Simulator,
   TimedEvent,
@@ -76,6 +77,15 @@ export function replayUpTo(timeline: TimedEvent[], t: number): RunState {
   for (const beat of timeline) {
     if (beat.at_ms <= t) s = applyEvent(s, beat.event);
   }
+  return s;
+}
+
+/** Fold an existing snapshot (e.g. an InsForge initial load) into reducer state. */
+export function hydrateFromSnapshot(snap: RunSnapshot): RunState {
+  let s = applyEvent(initialRunState(), { kind: 'run', run: snap.run });
+  for (const p of snap.personas) s = applyEvent(s, { kind: 'persona', persona: p });
+  for (const sim of snap.simulators) s = applyEvent(s, { kind: 'simulator', simulator: sim });
+  for (const f of snap.findings) s = applyEvent(s, { kind: 'finding', finding: f });
   return s;
 }
 

@@ -9,6 +9,7 @@
     "test": "node --test 'lib/*.test.ts'"
   },
   "dependencies": {
+    "@insforge/sdk": "^1.3.1",
     "@swarm/shared": "*",
     "next": "15.5.19",
     "react": "19.0.0",
