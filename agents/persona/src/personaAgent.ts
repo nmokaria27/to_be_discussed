@@ -12,6 +12,20 @@ import type { PersonaSpec } from '@swarm/shared';
 import type { Action, DriverAgent } from './driver.ts';
 import type { SwarmWriter } from '@swarm/shared';
 
+/** Optional LLM brain: given the observation, decide the next action + defects. */
+export type DecideFn = (
+  obs: import('./driver.ts').Observation,
+  step: number,
+) => Promise<{ action: Action; defects: DefectHintLike[]; done: boolean }>;
+
+interface DefectHintLike {
+  edge_case: Finding['edge_case'];
+  severity: Severity;
+  title: string;
+  repro_steps: string;
+  screen: string;
+}
+
 export interface RunPersonaCtx {
   runId: string;
   persona: Persona; // pre-created row (id, key, display_name, target_edge_cases)
@@ -22,6 +36,8 @@ export interface RunPersonaCtx {
   nextId: (prefix: string) => string;
   stepBudget?: number;
   now?: () => string;
+  /** When provided, the persona uses the LLM brain to decide flows (real agentic mode). */
+  decide?: DecideFn;
 }
 
 export interface PersonaResult {
@@ -65,9 +81,23 @@ export async function runPersona(ctx: RunPersonaCtx): Promise<PersonaResult> {
 
   for (let step = 0; step < budget; step += 1) {
     const obs = await ctx.driver.observe();
-    const hints = await ctx.driver.detectVisualDefects(obs);
+    // Real agentic mode: the LLM decides the flow + spots defects. Scripted mode
+    // (no `decide`): the driver's heuristic detector + persona-target filter.
+    let hints: DefectHintLike[];
+    let action: Action;
+    let done = false;
+    if (ctx.decide) {
+      const d = await ctx.decide(obs, step);
+      hints = d.defects; // agent's own judgment — not filtered to its target lens
+      action = d.action;
+      done = d.done;
+    } else {
+      hints = (await ctx.driver.detectVisualDefects(obs)).filter((h) =>
+        ctx.persona.target_edge_cases.includes(h.edge_case),
+      );
+      action = chooseAction(ctx.spec, step);
+    }
     for (const h of hints) {
-      if (!ctx.persona.target_edge_cases.includes(h.edge_case)) continue; // persona reports its lens
       const screenKey = `${ctx.persona.key}:${h.edge_case}:${h.screen}`;
       if (seen.has(screenKey)) continue;
       seen.add(screenKey);
@@ -89,7 +119,8 @@ export async function runPersona(ctx: RunPersonaCtx): Promise<PersonaResult> {
       await ctx.writer.insertFinding(finding);
       findings.push(finding);
     }
-    await ctx.driver.act(chooseAction(ctx.spec, step));
+    await ctx.driver.act(action);
+    if (done) break;
   }
 
   const rating = ratingFromFindings(findings);
