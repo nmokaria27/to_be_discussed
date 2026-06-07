@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Activity,
   ArrowRight,
@@ -26,6 +26,7 @@ import {
 import { SimulatorTile } from './SimulatorTile.tsx';
 import { FindingsFeed } from './FindingsFeed.tsx';
 import { RecordButton } from './RecordButton.tsx';
+import { SwarmModal } from './SwarmModal.tsx';
 
 export interface DashboardViewProps {
   state: RunState;
@@ -59,6 +60,9 @@ export function DashboardView(props: DashboardViewProps) {
     const p = state.personas[personaId];
     return { name: p?.display_name ?? personaId, key: p?.key ?? '' };
   };
+
+  const [selId, setSelId] = useState<string | null>(null);
+  const selected = sims.find((s) => s.id === selId) ?? null;
 
   const status = state.run?.status;
 
@@ -136,6 +140,7 @@ export function DashboardView(props: DashboardViewProps) {
                   simulator={sim}
                   persona={state.personas[sim.persona_id]}
                   findingCount={findingsPerSim[sim.id] ?? 0}
+                  onOpen={() => setSelId(sim.id)}
                 />
               ))}
             </div>
@@ -157,6 +162,15 @@ export function DashboardView(props: DashboardViewProps) {
             </Link>
           )}
         </div>
+      )}
+
+      {selected && (
+        <SwarmModal
+          simulator={selected}
+          persona={state.personas[selected.persona_id]}
+          findings={state.findings.filter((f) => f.simulator_id === selected.id)}
+          onClose={() => setSelId(null)}
+        />
       )}
     </div>
   );

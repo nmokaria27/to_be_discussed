@@ -12,6 +12,7 @@
  */
 
 import { execFile } from 'node:child_process';
+import { writeFileSync } from 'node:fs';
 import { promisify } from 'node:util';
 import { join } from 'node:path';
 import OpenAI from 'openai';
@@ -24,15 +25,32 @@ import { decideStep } from '../../../agents/persona/src/agentBrain.ts';
 const exec = promisify(execFile);
 const ROOT = join(import.meta.dirname, '..', '..', '..');
 const LIM = join(ROOT, 'node_modules', '.bin', 'lim');
+const INSF = join(ROOT, 'node_modules', '.bin', 'insforge');
 const APP_DIR = process.env.LIM_APP_DIR ?? join(ROOT, 'sample-native-app');
+// lim.run free/org concurrency cap is 5 iOS simulators — never exceed it, so the
+// whole grid stays live (no "simulator down" from a 403 over-limit).
+const MAX_SIMS = Number(process.env.LIM_MAX_SIMS) || 5;
 const arg = (f: string, d: number) => {
   const i = process.argv.indexOf(f);
   return i >= 0 && Number.isFinite(Number(process.argv[i + 1])) ? Number(process.argv[i + 1]) : d;
 };
 
 async function lim(args: string[]): Promise<string> {
-  const { stdout } = await exec(LIM, args, { cwd: APP_DIR, env: process.env, maxBuffer: 32 * 1024 * 1024, timeout: 300000 });
+  const { stdout } = await exec(LIM, args, { cwd: APP_DIR, env: process.env, maxBuffer: 64 * 1024 * 1024, timeout: 300000 });
   return stdout;
+}
+
+/** Upload a local file to the InsForge `recordings` bucket; returns the public URL. */
+async function uploadFile(localPath: string, objectKey: string): Promise<string | null> {
+  try {
+    const { stdout } = await exec(INSF, ['storage', 'upload', localPath, '--bucket', 'recordings', '--key', objectKey, '--json'], {
+      cwd: ROOT, env: process.env, maxBuffer: 16 * 1024 * 1024, timeout: 120000,
+    });
+    return (JSON.parse(stdout) as { url?: string }).url ?? null;
+  } catch (e) {
+    console.error('  upload failed', objectKey, (e as Error).message.slice(0, 80));
+    return null;
+  }
 }
 
 const baseUrl = process.env.INSFORGE_URL;
@@ -43,7 +61,7 @@ if (!baseUrl || !key || !orKey) {
   process.exit(1);
 }
 
-const size = arg('--size', 2);
+const size = Math.min(arg('--size', MAX_SIMS), MAX_SIMS);
 const budget = arg('--budget', 3);
 const writer = new InsForgeWriter({ baseUrl, key });
 const openai = new OpenAI({ baseURL: 'https://openrouter.ai/api/v1', apiKey: orKey });
@@ -118,17 +136,36 @@ console.log(`▶ agents exploring (LLM-decided flows)…`);
 const results = await Promise.all(
   units.map(async (u) => {
     if (!u.iosId) return { ok: false, rating: null as number | null };
+    const logLines: string[] = [`# ${u.spec.display_name} — session log (run ${runId})`, `# ${u.spec.disposition}`, ''];
     try {
+      await lim(['ios', 'record', 'start', '--id', u.iosId]).catch(() => {}); // session video
       const driver = new LimDriver({ cwd: APP_DIR, iosId: u.iosId });
       const r = await runPersona({
         runId, persona: u.persona, spec: u.spec, simulator: u.simulator, driver, writer,
         nextId: (p) => rng.id(p), stepBudget: budget, now,
         decide: async (obs, step) => {
           const d = await decideStep({ client: openai, spec: u.spec, observation: obs, step, budget });
+          logLines.push(`[step ${step + 1}] screen=${obs.screen} → ${d.action.kind}${d.thought ? `  «${d.thought}»` : ''}`);
+          for (const f of d.defects) logLines.push(`   ⚑ ${f.severity.toUpperCase()} ${f.edge_case}: ${f.title}`);
           return { action: d.action, defects: d.defects, done: d.done };
         },
       });
-      console.log(`  ✓ ${u.spec.display_name}: ${r.findings.length} findings, ${r.rating}/5`);
+      // Finalize + upload the session video and the decision log to InsForge Storage.
+      logLines.push('', `# verdict: ${r.rating}/5 — "${r.review}"`);
+      let videoUrl: string | null = null;
+      let logUrl: string | null = null;
+      try {
+        const mp4 = `/tmp/${runId}-${u.spec.key}.mp4`;
+        await lim(['ios', 'record', 'stop', '--id', u.iosId, '-o', mp4]);
+        videoUrl = await uploadFile(mp4, `${runId}/${u.spec.key}.mp4`);
+      } catch (e) {
+        console.error(`  record/upload failed ${u.spec.key}:`, (e as Error).message.slice(0, 80));
+      }
+      const logf = `/tmp/${runId}-${u.spec.key}.log.txt`;
+      writeFileSync(logf, logLines.join('\n'));
+      logUrl = await uploadFile(logf, `${runId}/${u.spec.key}.log.txt`);
+      await writer.upsertSimulator({ ...u.simulator, video_url: videoUrl, log_url: logUrl });
+      console.log(`  ✓ ${u.spec.display_name}: ${r.findings.length} findings, ${r.rating}/5${videoUrl ? ' +video' : ''}`);
       return { ok: true, rating: r.rating };
     } catch (e) {
       console.error(`  ✗ ${u.spec.display_name}:`, (e as Error).message);
