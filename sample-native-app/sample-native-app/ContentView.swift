@@ -25,10 +25,28 @@ struct Task: Identifiable, Equatable, Hashable {
 }
 
 final class AppStore: ObservableObject {
-    @Published var notes: [Note] = []        // SEEDED empty_state: starts empty
-    @Published var tasks: [Task] = []
+    @Published var notes: [Note]
+    @Published var tasks: [Task]
     @Published var signedIn = true
     @Published var syncing = false
+
+    init() {
+        // Demo data so the app has real content to explore + show.
+        notes = [
+            Note(title: "Welcome to Notebook", body: "Tap + to add a note, swipe to delete, and use Search to find anything.", tag: "Getting Started"),
+            Note(title: "Weekly grocery list with produce, dairy, and pantry staples that will not fit on one line", body: "Milk, eggs, bread, spinach, coffee, rice, olive oil, tomatoes, yogurt, bananas.", tag: "Personal"),
+            Note(title: "Q3 planning", body: "Roadmap themes, hiring plan, and OKRs for the next quarter.", tag: "Work"),
+            Note(title: "Book recommendations", body: "Designing Data-Intensive Applications; The Mom Test; Shape Up.", tag: "Personal"),
+            Note(title: "Standup notes — June 6", body: "Shipped the live swarm; next: reporting polish and demo prep.", tag: "Work"),
+            Note(title: "Trip ideas", body: "Kyoto in autumn, Lisbon in spring, a long weekend in the mountains.", tag: "Personal"),
+        ]
+        tasks = [
+            Task(title: "Review the latest pull request"),
+            Task(title: "Prepare the demo script", done: true),
+            Task(title: "Email the design feedback"),
+            Task(title: "Book the team lunch", done: true),
+        ]
+    }
 
     func addNote() { notes.insert(Note(title: "", body: ""), at: 0) }
     func seedLargeData() { notes = (1...10_000).map { Note(title: "Note \($0)", body: "Body for note number \($0) with some content.") } }

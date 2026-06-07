@@ -116,6 +116,7 @@ try {
 } catch (e) {
   console.log('  build step reported non-zero (continuing):', (e as Error).message.slice(0, 100));
 }
+await sleep(1000); // settle after the app build before provisioning (requested)
 
 type Unit = (typeof units)[number];
 
