@@ -7,6 +7,7 @@ import {
   ArrowRight,
   Bug,
   CircleDot,
+  History,
   RotateCcw,
   ScanSearch,
   Sparkles,
@@ -73,6 +74,7 @@ export function DashboardView(props: DashboardViewProps) {
         </div>
 
         <div className="controls">
+          <Link href="/runs" className="btn btn--ghost"><History size={15} /> History</Link>
           <RecordButton />
           <span className={`livepill ${running ? 'livepill--on' : ''}`}>
             <span className="livepill__dot" />

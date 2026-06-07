@@ -61,36 +61,59 @@ const run: Run = {
 await writer.upsertRun(run);
 console.log(`RUN_ID ${runId}`);
 
-console.log(`▶ live-swarm: building app + provisioning ${size} real iOS simulators…`);
-await lim(['xcode', 'build', '.']);
-
-// Provision one real simulator per persona.
-const units = [];
-for (const spec of specs) {
+// Write ALL persona + simulator rows up front (booting) so the dashboard shows
+// the full grid immediately instead of an empty "Provisioning" screen.
+const units = specs.map((spec) => {
   const persona: Persona = {
     id: rng.id('persona'), run_id: runId, key: spec.key, display_name: spec.display_name,
     target_edge_cases: spec.target_edge_cases, status: 'provisioning', rating: null, review_text: null,
   };
-  await writer.upsertPersona(persona);
-  let iosId = '';
-  try {
-    const out = await lim(['ios', 'create', '--attach']);
-    iosId = (out.match(/ID:\s*(ios_[a-z0-9_]+)/i)?.[1]) ?? '';
-  } catch (e) {
-    console.error(`  sim provision failed for ${spec.display_name}:`, (e as Error).message);
-  }
   const simulator: Simulator = {
     id: rng.id('sim'), run_id: runId, persona_id: persona.id,
-    lim_handle: iosId || 'unprovisioned', stream_url: null,
-    status: iosId ? 'live' : 'down',
+    lim_handle: 'pending', stream_url: null, status: 'booting',
   };
-  await writer.upsertSimulator(simulator);
-  console.log(`  ${spec.display_name} → ${iosId || 'FAILED'}`);
-  units.push({ spec, persona, simulator, iosId });
+  return { spec, persona, simulator, iosId: '' as string };
+});
+for (const u of units) {
+  await writer.upsertPersona(u.persona);
+  await writer.upsertSimulator(u.simulator);
+}
+await writer.upsertRun({ ...run, status: 'running' });
+console.log(`▶ run ${runId} — grid up; building + provisioning ${size} real iOS simulators…`);
+console.log(`  open: http://localhost:3000/?run=${runId}`);
+
+// Clear any stale (dead) attached simulator so `xcode build` doesn't fail on its
+// install step (404 folder-sync), then build (tolerate non-zero — the build
+// artifact itself succeeds; create --attach installs it per fresh sim).
+try {
+  const info = await lim(['xcode', 'get']);
+  const dead = info.match(/attached \((ios_[a-z0-9_]+)\)/i)?.[1];
+  if (dead) await lim(['ios', 'delete', dead]).catch(() => {});
+} catch { /* best-effort */ }
+try {
+  await lim(['xcode', 'build', '.']);
+} catch (e) {
+  console.log('  build step reported non-zero (continuing):', (e as Error).message.slice(0, 100));
 }
 
-await writer.upsertRun({ ...run, status: 'running' });
-console.log(`▶ run ${runId} — agents exploring (LLM-decided flows)… open:\n  http://localhost:3000/?run=${runId}\n`);
+// Provision each simulator; update its row live/down as it comes up (partial OK).
+for (const u of units) {
+  try {
+    const out = await lim(['ios', 'create', '--attach']);
+    u.iosId = out.match(/ID:\s*(ios_[a-z0-9_]+)/i)?.[1] ?? '';
+  } catch (e) {
+    console.error(`  sim provision failed for ${u.spec.display_name}:`, (e as Error).message.slice(0, 80));
+  }
+  if (u.iosId) {
+    u.simulator = { ...u.simulator, lim_handle: u.iosId, status: 'live' };
+    await writer.upsertSimulator(u.simulator);
+  } else {
+    await writer.upsertSimulator({ ...u.simulator, status: 'down' });
+    await writer.upsertPersona({ ...u.persona, status: 'crashed' });
+  }
+  console.log(`  ${u.spec.display_name} → ${u.iosId || 'FAILED'}`);
+}
+console.log(`▶ agents exploring (LLM-decided flows)…`);
 
 const results = await Promise.all(
   units.map(async (u) => {

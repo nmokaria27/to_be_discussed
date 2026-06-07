@@ -205,3 +205,18 @@ html, body {
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
 @keyframes scan { 0% { top: -38px; } 100% { top: 128px; } }
 @media (prefers-reduced-motion: reduce) { .tile__scan, .livepill--on .livepill__dot { animation: none; } }
+
+/* ---- run history ---- */
+.runs { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+.runrow { display: flex; align-items: center; gap: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 18px; box-shadow: var(--shadow-sm); }
+.runrow__status { font-size: 11px; font-weight: 600; text-transform: capitalize; padding: 4px 10px; border-radius: 999px; background: var(--bg); color: var(--ink-2); border: 1px solid var(--border); white-space: nowrap; }
+.runrow__status--converged { color: var(--accent); border-color: rgba(0,113,227,0.3); }
+.runrow__status--running, .runrow__status--provisioning { color: var(--live); border-color: rgba(52,199,89,0.3); }
+.runrow__status--failed { color: var(--danger); border-color: rgba(255,59,48,0.3); }
+.runrow__main { flex: 1; min-width: 0; }
+.runrow__title { font-size: 16px; font-weight: 600; }
+.runrow__sub { font-weight: 400; color: var(--ink-3); font-size: 13px; font-family: var(--font-sans); }
+.runrow__when { font-size: 12px; color: var(--ink-3); margin-top: 3px; }
+.runrow__actions { display: flex; gap: 8px; }
+.runrow__btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink); text-decoration: none; padding: 8px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.runrow__btn:hover { background: var(--surface-2); }

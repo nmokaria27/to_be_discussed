@@ -39,6 +39,11 @@ export async function loadLatestRun(cfg: InsForgeConfig): Promise<RunSnapshot | 
   return run ? loadRunSnapshot(cfg, run.id) : null;
 }
 
+/** Recent runs for the history view (newest first). */
+export async function loadRuns(cfg: InsForgeConfig, limit = 30): Promise<Run[]> {
+  return get<Run[]>(cfg, `runs?order=started_at.desc&limit=${limit}`);
+}
+
 export function insforgeConfigFromEnv(env: Record<string, string | undefined>): InsForgeConfig | null {
   const baseUrl = env.NEXT_PUBLIC_INSFORGE_URL ?? env.INSFORGE_URL;
   const key = env.NEXT_PUBLIC_INSFORGE_ANON_KEY ?? env.INSFORGE_KEY;
