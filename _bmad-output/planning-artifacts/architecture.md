@@ -56,6 +56,7 @@ A single-page web **Dashboard** (Next.js/Vercel) triggers a **Run**. An **Orches
 | **Orchestrator** | On run create: provision N simulators (lim.run) + N VMs (Replicas), bind 1:1, launch agents, track run lifecycle, teardown | Node/TS service (Replicas API + lim.run API) | Dev A |
 | **Persona Agent** | Embody one persona; explore the app via DriverAgent; capture Findings + final Review; write to InsForge | Python or TS agent on Replicas VM | Dev A |
 | **DriverAgent** | Abstraction: perceive screen (a11y tree + screenshot), choose+execute actions, detect visual defects | Interface + impl; pluggable | Dev A |
+| **LimDriver / WebDriver** | DriverAgent impls: lim.run iOS simulator (mobile) and Playwright (web, Epic 7) — same C7 interface | TS | Claude |
 | **InsForge data layer** | Schema, storage buckets, realtime channels, `InsForgeWriter`, RLS/access for demo | InsForge (Postgres/storage/realtime) | Claude |
 | **Report Site** | Render ranked, grouped report from InsForge data; shareable URL | Next.js, Vercel | Claude |
 | **Demo App** | Curated Notes/Tasks iOS app w/ seeded edge cases; InsForge backend | SwiftUI (or RN) iOS app + InsForge | Claude |

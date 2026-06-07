@@ -1,9 +1,10 @@
 'use client';
 
 import { motion } from 'motion/react';
+import { Bug, Smartphone, TriangleAlert } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { Persona, Simulator } from '@swarm/shared';
-import { personaEmoji } from '../lib/personaVisuals.ts';
+import { personaIcon } from '../lib/personaVisuals.ts';
 
 export function SimulatorTile({
   simulator,
@@ -29,35 +30,37 @@ export function SimulatorTile({
 
   const status = simulator.status;
   const name = persona?.display_name ?? simulator.persona_id;
-  const key = persona?.key ?? '';
+  const Icon = personaIcon(persona?.key ?? '');
 
   return (
     <motion.div
       className={`tile tile--${status} ${flash ? 'tile--flash' : ''}`}
-      initial={{ opacity: 0, scale: 0.9, y: 8 }}
+      initial={{ opacity: 0, scale: 0.96, y: 8 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 320, damping: 26 }}
     >
       <div className="tile__bar">
-        <span className="tile__emoji">{personaEmoji(key)}</span>
+        <span className="tile__avatar"><Icon size={16} strokeWidth={1.9} /></span>
         <span className="tile__name">{name}</span>
-        <span className={`tile__status tile__status--${status}`}>{status}</span>
+        <span className={`tile__status tile__status--${status}`}>
+          <span className="dot" />
+          {status}
+        </span>
       </div>
 
       <div className="tile__screen">
         {status === 'down' ? (
-          <div className="tile__down">⚠ simulator down</div>
+          <span className="tile__down-label"><TriangleAlert size={14} /> simulator down</span>
         ) : status === 'booting' ? (
-          <div className="tile__boot">booting iOS…</div>
+          <div className="tile__device"><Smartphone className="ph" size={26} strokeWidth={1.5} /><span className="sub">booting iOS…</span></div>
         ) : (
-          <div className="tile__phone">
+          <>
             <div className="tile__scan" />
-            <div className="tile__glyph">{personaEmoji(key)}</div>
-            <div className="tile__sub">exploring</div>
-          </div>
+            <div className="tile__device"><Icon className="ph" size={30} strokeWidth={1.5} /><span className="sub">exploring</span></div>
+          </>
         )}
         {findingCount > 0 && status !== 'down' && (
-          <div className="tile__bugs">🐛 {findingCount}</div>
+          <span className="tile__bugs"><Bug size={12} /> {findingCount}</span>
         )}
       </div>
     </motion.div>

@@ -56,3 +56,9 @@ The **Fake Swarm** (`packages/shared/src/fake-swarm.ts`) emits the *exact shapes
 
 ## Contracts
 All cross-workstream contracts (C1–C9) are defined in `architecture.md` §9. Freeze them before diverging.
+
+## Design
+The web UI is a refined, Apple-grade minimalist system: light and airy, near-monochrome neutrals with a single blue accent, **Geist** type with tabular mono numerals, real **lucide-react** iconography (no emoji), and subtle **motion** spring animations. Components live in `apps/web/components`; tokens + styles in `apps/web/app/globals.css`.
+
+## Web testing (Epic 7)
+The swarm also tests **websites**, not just mobile. `agents/persona/src/webDriver.ts` is a Playwright-backed `DriverAgent` (same C7 interface as `LimDriver`); `webDefects.ts` is the pure, tested analyzer (alt text, accessible names, `lang`, blank render, console/network errors → battery-classed findings). Install `playwright` to run it against a live URL; the analyzer is unit-tested with no browser.

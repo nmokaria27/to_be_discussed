@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from 'motion/react';
 import type { FeedItem } from '../lib/runReducer.ts';
-import { personaEmoji, SEVERITY_COLOR } from '../lib/personaVisuals.ts';
+import { personaIcon, SEVERITY } from '../lib/personaVisuals.ts';
 
 export function FindingsFeed({
   items,
@@ -18,37 +18,39 @@ export function FindingsFeed({
         <span className="feed__sub">most severe first</span>
       </div>
       <div className="feed__list">
-        {items.length === 0 && <div className="feed__empty">No findings yet…</div>}
+        {items.length === 0 && <div className="feed__empty">No findings yet — the swarm is exploring.</div>}
         <AnimatePresence initial={false}>
-        {items.map((item) => {
-          const p = personaOf(item.finding.persona_id);
-          return (
-            <motion.div
-              key={item.groupKey}
-              className="finding"
-              layout
-              initial={{ opacity: 0, x: 16 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-            >
-              <span
-                className="finding__sev"
-                style={{ background: SEVERITY_COLOR[item.finding.severity] }}
-                title={item.finding.severity}
-              />
-              <div className="finding__body">
-                <div className="finding__title">{item.finding.title}</div>
-                <div className="finding__meta">
-                  <span>
-                    {personaEmoji(p.key)} {p.name}
-                  </span>
-                  <span className="finding__edge">{item.finding.edge_case}</span>
-                  {item.count > 1 && <span className="finding__count">×{item.count}</span>}
+          {items.map((item) => {
+            const p = personaOf(item.finding.persona_id);
+            const PIcon = personaIcon(p.key);
+            const sev = SEVERITY[item.finding.severity];
+            const SevIcon = sev.Icon;
+            return (
+              <motion.div
+                key={item.groupKey}
+                className="finding"
+                layout
+                initial={{ opacity: 0, x: 14 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+              >
+                <span
+                  className="finding__icon"
+                  style={{ background: `${sev.color}1a`, color: sev.color }}
+                >
+                  <SevIcon size={15} />
+                </span>
+                <div className="finding__body">
+                  <div className="finding__title">{item.finding.title}</div>
+                  <div className="finding__meta">
+                    <span className="finding__chip"><PIcon size={11} /> {p.name}</span>
+                    <span className="finding__chip">{item.finding.edge_case}</span>
+                    {item.count > 1 && <span className="finding__count">×{item.count}</span>}
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          );
-        })}
+              </motion.div>
+            );
+          })}
         </AnimatePresence>
       </div>
     </aside>
