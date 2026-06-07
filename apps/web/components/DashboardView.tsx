@@ -24,6 +24,7 @@ import {
 } from '../lib/runReducer.ts';
 import { SimulatorTile } from './SimulatorTile.tsx';
 import { FindingsFeed } from './FindingsFeed.tsx';
+import { RecordButton } from './RecordButton.tsx';
 
 export interface DashboardViewProps {
   state: RunState;
@@ -72,6 +73,7 @@ export function DashboardView(props: DashboardViewProps) {
         </div>
 
         <div className="controls">
+          <RecordButton />
           <span className={`livepill ${running ? 'livepill--on' : ''}`}>
             <span className="livepill__dot" />
             {running ? 'Live' : finished ? 'Converged' : 'Idle'}
