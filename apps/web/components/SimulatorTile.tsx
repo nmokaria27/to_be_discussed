@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'motion/react';
-import { Bug, CheckCircle2, Smartphone, TriangleAlert } from 'lucide-react';
+import { Bug, CheckCircle2, Play, Smartphone, TriangleAlert } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { Persona, Simulator } from '@swarm/shared';
 import { personaIcon } from '../lib/personaVisuals.ts';
@@ -10,10 +10,12 @@ export function SimulatorTile({
   simulator,
   persona,
   findingCount,
+  onOpen,
 }: {
   simulator: Simulator;
   persona: Persona | undefined;
   findingCount: number;
+  onOpen?: () => void;
 }) {
   const [flash, setFlash] = useState(false);
   const prev = useRef(findingCount);
@@ -57,6 +59,8 @@ export function SimulatorTile({
       initial={{ opacity: 0, scale: 0.96, y: 8 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 320, damping: 26 }}
+      onClick={onOpen}
+      role="button"
     >
       <div className="tile__bar">
         <span className="tile__avatar"><Icon size={16} strokeWidth={1.9} /></span>
@@ -95,6 +99,7 @@ export function SimulatorTile({
         {findingCount > 0 && !crashed && (
           <span className="tile__bugs"><Bug size={12} /> {findingCount}</span>
         )}
+        {simulator.video_url && <span className="tile__playhint"><Play size={11} /> recording</span>}
       </div>
     </motion.div>
   );

@@ -102,6 +102,10 @@ export interface Simulator {
   /** Live-view surface for the Grid; null while booting. */
   stream_url: string | null;
   status: SimulatorStatus;
+  /** Session video (lim.run recording) uploaded to InsForge Storage; null if none. */
+  video_url?: string | null;
+  /** Agent decision/findings log uploaded to InsForge Storage; null if none. */
+  log_url?: string | null;
 }
 
 export interface Finding {
