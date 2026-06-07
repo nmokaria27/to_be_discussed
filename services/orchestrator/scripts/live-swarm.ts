@@ -100,13 +100,15 @@ await writer.upsertRun({ ...run, status: 'running' });
 console.log(`▶ run ${runId} — grid up; building + provisioning ${size} real iOS simulators…`);
 console.log(`  open: http://localhost:3000/?run=${runId}`);
 
-// Clear any stale (dead) attached simulator so `xcode build` doesn't fail on its
-// install step (404 folder-sync), then build (tolerate non-zero — the build
-// artifact itself succeeds; create --attach installs it per fresh sim).
+// Free the org's concurrency cap: delete ALL existing simulators before
+// provisioning, so a one-click run always succeeds regardless of leftovers from
+// a prior run (otherwise `create` 403s once the 5-sim cap is reached). This also
+// clears any dead attached sim that would fail `xcode build`'s install step.
 try {
-  const info = await lim(['xcode', 'get']);
-  const dead = info.match(/attached \((ios_[a-z0-9_]+)\)/i)?.[1];
-  if (dead) await lim(['ios', 'delete', dead]).catch(() => {});
+  const list = await lim(['ios', 'list']);
+  const ids = [...new Set([...list.matchAll(/ios_[a-z0-9_]+/gi)].map((m) => m[0]))];
+  for (const id of ids) await lim(['ios', 'delete', id]).catch(() => {});
+  if (ids.length) console.log(`  cleared ${ids.length} existing simulator(s) to free the cap`);
 } catch { /* best-effort */ }
 try {
   await lim(['xcode', 'build', '.']);
