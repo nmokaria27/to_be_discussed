@@ -16,5 +16,9 @@
   },
   "engines": {
     "node": ">=23.6"
+  },
+  "dependencies": {
+    "lim": "^0.13.2",
+    "openai": "^6.42.0"
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useInsforgeRun } from '../lib/useInsforgeRun.ts';
 import { DashboardView } from './DashboardView.tsx';
 
@@ -15,6 +15,13 @@ export default function LiveDashboard() {
   const [runId, setRunId] = useState<string | null>(null);
   const [launching, setLaunching] = useState(false);
   const state = useInsforgeRun(runId);
+
+  // Subscribe to a real run launched by the orchestrator (e.g. live-swarm script):
+  // open /?run=<id> to watch real lim simulators stream live.
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get('run');
+    if (id) setRunId(id);
+  }, []);
 
   const status = state.run?.status;
   const finished = status === 'converged';
