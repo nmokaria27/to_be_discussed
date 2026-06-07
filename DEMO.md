@@ -55,3 +55,23 @@ Replicas: `replicas list` then `replicas delete <name>` for any spawned workspac
 - The demo app ships realistic seeded bugs (empty_state, long-name, rapid-tap,
   tiny-screen, large-data, accessibility) so the real swarm reliably finds issues
   without looking staged (SM-C2).
+
+## Live agentic mode (real swarm, agents decide flows, live device frames)
+The strongest demo: real iOS simulators streaming live in the grid while LLM agents decide their own flows.
+
+```bash
+# 1. start the web app (live InsForge mode)
+cd apps/web && PORT=3000 npm start          # http://localhost:3000
+
+# 2. in another terminal, launch the real swarm (bounded; --keep leaves sims up for live frames)
+node --env-file=.env services/orchestrator/scripts/live-swarm.ts --size 2 --keep
+
+# 3. open the printed URL — the grid shows REAL device frames + the agents' findings
+#    http://localhost:3000/?run=<run_id>
+```
+- Agents decide flows via a vision LLM through the **InsForge Model Gateway** (OpenRouter); no scripts, no seeded bugs.
+- Tiles poll `/api/frame/[simId]` → real `lim ios screenshot` frames (a wall of live iOS phones).
+- Findings + reviews are written to InsForge and stream into the dashboard live; the report reads them back.
+- **Teardown after**: `cd sample-native-app && npx lim ios list` then `npx lim ios delete <id>` for each (or omit `--keep` so the script tears down automatically).
+
+Sponsors, all load-bearing: **lim.run** (live simulators the agents drive), **InsForge** (Postgres + realtime + Model Gateway for the agent brain + report hosting), **Replicas** (`spike-2-ios-agent` VM hosts the same agent code, repo-linked).

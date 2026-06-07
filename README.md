@@ -62,3 +62,6 @@ The web UI is a refined, Apple-grade minimalist system: light and airy, near-mon
 
 ## Web testing (Epic 7)
 The swarm also tests **websites**, not just mobile. `agents/persona/src/webDriver.ts` is a Playwright-backed `DriverAgent` (same C7 interface as `LimDriver`); `webDefects.ts` is the pure, tested analyzer (alt text, accessible names, `lang`, blank render, console/network errors → battery-classed findings). Install `playwright` to run it against a live URL; the analyzer is unit-tested with no browser.
+
+## Live agentic swarm
+Beyond the fixture demo, the swarm runs for real: `services/orchestrator/scripts/live-swarm.ts` provisions real lim.run iOS simulators, and each persona agent **decides its own flow** via a vision LLM through the **InsForge Model Gateway** (OpenRouter) — no scripts, no seeded bugs. The dashboard grid renders **live device frames** (`/api/frame/[simId]` → `lim ios screenshot`) so you watch real iOS phones being tested in parallel, findings streaming in. See `DEMO.md` → "Live agentic mode".
