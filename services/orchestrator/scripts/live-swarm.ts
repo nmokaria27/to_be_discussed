@@ -52,14 +52,17 @@ const now = () => new Date().toISOString();
 const runId = rng.id('run');
 const specs = selectPersonas(size);
 
-console.log(`▶ live-swarm: building app + provisioning ${size} real iOS simulators…`);
-await lim(['xcode', 'build', '.']);
-
+// Create the run row + announce the id FIRST so a caller (e.g. the dashboard
+// Unleash route) can return it immediately and subscribe while we build/provision.
 const run: Run = {
   id: runId, app_id: 'sample-native', status: 'provisioning', swarm_size: specs.length,
   swarm_rating: null, started_at: now(), converged_at: null,
 };
 await writer.upsertRun(run);
+console.log(`RUN_ID ${runId}`);
+
+console.log(`▶ live-swarm: building app + provisioning ${size} real iOS simulators…`);
+await lim(['xcode', 'build', '.']);
 
 // Provision one real simulator per persona.
 const units = [];

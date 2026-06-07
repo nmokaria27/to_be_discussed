@@ -1,22 +1,60 @@
+import { spawn } from 'node:child_process';
+import { join } from 'node:path';
 import { InsForgeWriter, generateSnapshot, generateTimeline } from '@swarm/shared';
 import type { RealtimeEvent, TimedEvent } from '@swarm/shared';
 
 export const dynamic = 'force-dynamic';
-// Streams rows over ~30s wall-clock — requires a persistent runtime (local
-// `next start` or a long-lived Node host). On frozen serverless the stream is
-// killed after the response; deploy this route to a Node server, or replace it
-// with Dev A's real orchestrator. maxDuration nudges platforms that honor it.
 export const maxDuration = 60;
 
-// Stand-in Orchestrator (contract C2). Until Dev A's real Replicas+lim.run
-// orchestrator lands, this streams a Fake Swarm run into InsForge over wall-clock
-// so the dashboard sees it live via InsForge realtime (C5). Swapping in the real
-// orchestrator changes nothing downstream — same rows, same channels.
+// Unleash → real device swarm. Spawns the live-swarm orchestrator (real lim.run
+// simulators + LLM agents that decide their own flows) as a detached process and
+// returns its run id as soon as the run row exists, so the dashboard can subscribe
+// and watch real frames stream in. Falls back to the Fake Swarm if the real swarm
+// can't start (e.g. lim/credentials unavailable) so the demo never dead-ends.
+
+function spawnRealSwarm(root: string, size: number): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const child = spawn(
+      'node',
+      ['--env-file=.env', 'services/orchestrator/scripts/live-swarm.ts', '--size', String(size)],
+      { cwd: root, env: process.env, detached: true, stdio: ['ignore', 'pipe', 'pipe'] },
+    );
+    let buf = '';
+    let errBuf = '';
+    const to = setTimeout(() => {
+      cleanup();
+      reject(new Error(`timeout waiting for RUN_ID${errBuf ? `: ${errBuf.slice(0, 200)}` : ''}`));
+    }, 30000);
+    const onData = (d: Buffer) => {
+      buf += d.toString();
+      const m = buf.match(/RUN_ID (run_[a-z0-9]+)/);
+      if (m) {
+        cleanup();
+        child.unref();
+        resolve(m[1] as string);
+      }
+    };
+    const onErr = (d: Buffer) => {
+      errBuf += d.toString();
+    };
+    function cleanup() {
+      clearTimeout(to);
+      child.stdout?.off('data', onData);
+      child.stderr?.off('data', onErr);
+    }
+    child.stdout?.on('data', onData);
+    child.stderr?.on('data', onErr);
+    child.on('error', (e) => {
+      cleanup();
+      reject(e);
+    });
+  });
+}
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const rank = (k: RealtimeEvent['kind']) => (k === 'run' ? 0 : k === 'persona' ? 1 : k === 'simulator' ? 2 : 3);
 
-async function streamRun(writer: InsForgeWriter, timeline: TimedEvent[]): Promise<void> {
+async function streamFakeRun(writer: InsForgeWriter, timeline: TimedEvent[]): Promise<void> {
   const sorted = [...timeline].sort((a, b) => a.at_ms - b.at_ms || rank(a.event.kind) - rank(b.event.kind));
   const start = Date.now();
   for (const beat of sorted) {
@@ -32,24 +70,26 @@ async function streamRun(writer: InsForgeWriter, timeline: TimedEvent[]): Promis
 
 export async function POST(req: Request) {
   const body = (await req.json().catch(() => ({}))) as { swarm_size?: number };
-  const swarmSize = Number(body.swarm_size) || 12;
+  const size = Number(body.swarm_size) || Number(process.env.LIVE_SWARM_SIZE) || 4;
+  const root = join(process.cwd(), '..', '..'); // repo root from apps/web
 
-  const baseUrl = process.env.NEXT_PUBLIC_INSFORGE_URL;
-  // Server-side writes use the admin key; fall back to anon (RLS also permits it).
-  const key = process.env.INSFORGE_API_KEY ?? process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY;
-  if (!baseUrl || !key) {
-    return Response.json({ error: 'InsForge not configured' }, { status: 500 });
+  // Real swarm first (live device frames + agents that decide flows).
+  try {
+    const runId = await spawnRealSwarm(root, size);
+    return Response.json({ run_id: runId, mode: 'real' });
+  } catch (err) {
+    console.error('real swarm unavailable, falling back to Fake Swarm:', (err as Error).message);
   }
 
-  // Unique-ish run per click; deterministic within the run.
+  // Fallback: Fake Swarm stream (no real devices, but a complete demo).
+  const baseUrl = process.env.NEXT_PUBLIC_INSFORGE_URL;
+  const key = process.env.INSFORGE_API_KEY ?? process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY;
+  if (!baseUrl || !key) return Response.json({ error: 'InsForge not configured' }, { status: 500 });
   const seed = Math.floor(Date.now() % 100000);
   const demoDurationMs = 30000;
-  const snapshot = generateSnapshot({ seed, swarmSize, demoDurationMs });
-  const timeline = generateTimeline({ seed, swarmSize, demoDurationMs });
+  const snapshot = generateSnapshot({ seed, swarmSize: 12, demoDurationMs });
+  const timeline = generateTimeline({ seed, swarmSize: 12, demoDurationMs });
   const writer = new InsForgeWriter({ baseUrl, key });
-
-  // Fire-and-forget: stream rows over ~30s; realtime triggers publish each one.
-  streamRun(writer, timeline).catch((e) => console.error('streamRun error', e));
-
-  return Response.json({ run_id: snapshot.run.id });
+  streamFakeRun(writer, timeline).catch((e) => console.error('fake stream error', e));
+  return Response.json({ run_id: snapshot.run.id, mode: 'fake' });
 }

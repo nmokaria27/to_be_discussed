@@ -107,6 +107,7 @@ html, body {
 }
 .tile:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
 .tile--live { border-color: rgba(52,199,89,0.4); }
+.tile--done { border-color: rgba(0,113,227,0.32); }
 .tile--down { opacity: .6; }
 .tile--flash { border-color: var(--danger) !important; box-shadow: 0 0 0 3px rgba(255,59,48,0.14); }
 
@@ -118,6 +119,7 @@ html, body {
 .tile__status--live .dot { background: var(--live); box-shadow: 0 0 0 3px rgba(52,199,89,0.18); }
 .tile__status--booting .dot { background: var(--booting); }
 .tile__status--down .dot { background: var(--danger); }
+.tile__status--done { color: var(--accent); }
 
 .tile__screen {
   position: relative; height: 128px; margin: 0 13px 13px; border-radius: var(--radius-sm);
