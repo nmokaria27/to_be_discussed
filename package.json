@@ -18,6 +18,7 @@
     "node": ">=23.6"
   },
   "dependencies": {
+    "@insforge/cli": "^0.1.87",
     "lim": "^0.13.2",
     "openai": "^6.42.0"
   }
