@@ -61,14 +61,15 @@ if (!baseUrl || !key || !orKey) {
   process.exit(1);
 }
 
-const size = Math.min(arg('--size', MAX_SIMS), MAX_SIMS);
+const personaCount = arg('--size', 8); // total personas; run in waves of MAX_SIMS
 const budget = arg('--budget', 3);
 const writer = new InsForgeWriter({ baseUrl, key });
 const openai = new OpenAI({ baseURL: 'https://openrouter.ai/api/v1', apiKey: orKey });
 const rng = makeRng(Math.floor(Date.now() % 100000));
 const now = () => new Date().toISOString();
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const runId = rng.id('run');
-const specs = selectPersonas(size);
+const specs = selectPersonas(personaCount);
 
 // Create the run row + announce the id FIRST so a caller (e.g. the dashboard
 // Unleash route) can return it immediately and subscribe while we build/provision.
@@ -97,95 +98,102 @@ for (const u of units) {
   await writer.upsertSimulator(u.simulator);
 }
 await writer.upsertRun({ ...run, status: 'running' });
-console.log(`▶ run ${runId} — grid up; building + provisioning ${size} real iOS simulators…`);
+console.log(`▶ run ${runId} — ${units.length} personas in waves of ${MAX_SIMS} (lim concurrency cap)…`);
 console.log(`  open: http://localhost:3000/?run=${runId}`);
 
-// Free the org's concurrency cap: delete ALL existing simulators before
-// provisioning, so a one-click run always succeeds regardless of leftovers from
-// a prior run (otherwise `create` 403s once the 5-sim cap is reached). This also
-// clears any dead attached sim that would fail `xcode build`'s install step.
-try {
-  const list = await lim(['ios', 'list']);
-  const ids = [...new Set([...list.matchAll(/ios_[a-z0-9_]+/gi)].map((m) => m[0]))];
-  for (const id of ids) await lim(['ios', 'delete', id]).catch(() => {});
-  if (ids.length) console.log(`  cleared ${ids.length} existing simulator(s) to free the cap`);
-} catch { /* best-effort */ }
+// Free the org concurrency cap (delete every existing sim) + clear any dead
+// attached sim that would fail `xcode build`'s install step.
+async function clearCap(): Promise<void> {
+  try {
+    const list = await lim(['ios', 'list']);
+    const ids = [...new Set([...list.matchAll(/ios_[a-z0-9_]+/gi)].map((m) => m[0]))];
+    for (const id of ids) await lim(['ios', 'delete', id]).catch(() => {});
+  } catch { /* best-effort */ }
+}
+await clearCap();
 try {
   await lim(['xcode', 'build', '.']);
 } catch (e) {
   console.log('  build step reported non-zero (continuing):', (e as Error).message.slice(0, 100));
 }
 
-// Provision each simulator; update its row live/down as it comes up (partial OK).
-for (const u of units) {
-  try {
-    const out = await lim(['ios', 'create', '--attach']);
-    u.iosId = out.match(/ID:\s*(ios_[a-z0-9_]+)/i)?.[1] ?? '';
-  } catch (e) {
-    console.error(`  sim provision failed for ${u.spec.display_name}:`, (e as Error).message.slice(0, 80));
-  }
-  if (u.iosId) {
-    u.simulator = { ...u.simulator, lim_handle: u.iosId, status: 'live' };
-    await writer.upsertSimulator(u.simulator);
-  } else {
-    await writer.upsertSimulator({ ...u.simulator, status: 'down' });
-    await writer.upsertPersona({ ...u.persona, status: 'crashed' });
-  }
-  console.log(`  ${u.spec.display_name} → ${u.iosId || 'FAILED'}`);
-}
-console.log(`▶ agents exploring (LLM-decided flows)…`);
+type Unit = (typeof units)[number];
 
-const results = await Promise.all(
-  units.map(async (u) => {
-    if (!u.iosId) return { ok: false, rating: null as number | null };
-    const logLines: string[] = [`# ${u.spec.display_name} — session log (run ${runId})`, `# ${u.spec.disposition}`, ''];
+async function runUnit(u: Unit): Promise<{ ok: boolean; rating: number | null }> {
+  const logLines: string[] = [`# ${u.spec.display_name} — session log (run ${runId})`, `# ${u.spec.disposition}`, ''];
+  try {
+    await lim(['ios', 'record', 'start', '--id', u.iosId]).catch(() => {}); // session video
+    const driver = new LimDriver({ cwd: APP_DIR, iosId: u.iosId });
+    const r = await runPersona({
+      runId, persona: u.persona, spec: u.spec, simulator: u.simulator, driver, writer,
+      nextId: (p) => rng.id(p), stepBudget: budget, now,
+      decide: async (obs, step) => {
+        const d = await decideStep({ client: openai, spec: u.spec, observation: obs, step, budget });
+        logLines.push(`[step ${step + 1}] screen=${obs.screen} → ${d.action.kind}${d.thought ? `  «${d.thought}»` : ''}`);
+        for (const f of d.defects) logLines.push(`   ⚑ ${f.severity.toUpperCase()} ${f.edge_case}: ${f.title}`);
+        return { action: d.action, defects: d.defects, done: d.done };
+      },
+    });
+    logLines.push('', `# verdict: ${r.rating}/5 — "${r.review}"`);
+    let videoUrl: string | null = null;
     try {
-      await lim(['ios', 'record', 'start', '--id', u.iosId]).catch(() => {}); // session video
-      const driver = new LimDriver({ cwd: APP_DIR, iosId: u.iosId });
-      const r = await runPersona({
-        runId, persona: u.persona, spec: u.spec, simulator: u.simulator, driver, writer,
-        nextId: (p) => rng.id(p), stepBudget: budget, now,
-        decide: async (obs, step) => {
-          const d = await decideStep({ client: openai, spec: u.spec, observation: obs, step, budget });
-          logLines.push(`[step ${step + 1}] screen=${obs.screen} → ${d.action.kind}${d.thought ? `  «${d.thought}»` : ''}`);
-          for (const f of d.defects) logLines.push(`   ⚑ ${f.severity.toUpperCase()} ${f.edge_case}: ${f.title}`);
-          return { action: d.action, defects: d.defects, done: d.done };
-        },
-      });
-      // Finalize + upload the session video and the decision log to InsForge Storage.
-      logLines.push('', `# verdict: ${r.rating}/5 — "${r.review}"`);
-      let videoUrl: string | null = null;
-      let logUrl: string | null = null;
-      try {
-        const mp4 = `/tmp/${runId}-${u.spec.key}.mp4`;
-        await lim(['ios', 'record', 'stop', '--id', u.iosId, '-o', mp4]);
-        videoUrl = await uploadFile(mp4, `${runId}/${u.spec.key}.mp4`);
-      } catch (e) {
-        console.error(`  record/upload failed ${u.spec.key}:`, (e as Error).message.slice(0, 80));
-      }
-      const logf = `/tmp/${runId}-${u.spec.key}.log.txt`;
-      writeFileSync(logf, logLines.join('\n'));
-      logUrl = await uploadFile(logf, `${runId}/${u.spec.key}.log.txt`);
-      await writer.upsertSimulator({ ...u.simulator, video_url: videoUrl, log_url: logUrl });
-      console.log(`  ✓ ${u.spec.display_name}: ${r.findings.length} findings, ${r.rating}/5${videoUrl ? ' +video' : ''}`);
-      return { ok: true, rating: r.rating };
+      const mp4 = `/tmp/${runId}-${u.spec.key}.mp4`;
+      await lim(['ios', 'record', 'stop', '--id', u.iosId, '-o', mp4]);
+      videoUrl = await uploadFile(mp4, `${runId}/${u.spec.key}.mp4`);
     } catch (e) {
-      console.error(`  ✗ ${u.spec.display_name}:`, (e as Error).message);
-      await writer.upsertPersona({ ...u.persona, status: 'crashed', rating: null, review_text: null });
-      await writer.upsertSimulator({ ...u.simulator, status: 'down' });
-      return { ok: false, rating: null as number | null };
+      console.error(`  record/upload failed ${u.spec.key}:`, (e as Error).message.slice(0, 80));
     }
-  }),
-);
+    const logf = `/tmp/${runId}-${u.spec.key}.log.txt`;
+    writeFileSync(logf, logLines.join('\n'));
+    const logUrl = await uploadFile(logf, `${runId}/${u.spec.key}.log.txt`);
+    await writer.upsertSimulator({ ...u.simulator, video_url: videoUrl, log_url: logUrl });
+    console.log(`  ✓ ${u.spec.display_name}: ${r.findings.length} findings, ${r.rating}/5${videoUrl ? ' +video' : ''}`);
+    return { ok: true, rating: r.rating };
+  } catch (e) {
+    console.error(`  ✗ ${u.spec.display_name}:`, (e as Error).message.slice(0, 120));
+    await writer.upsertPersona({ ...u.persona, status: 'crashed', rating: null, review_text: null });
+    await writer.upsertSimulator({ ...u.simulator, status: 'down' });
+    return { ok: false, rating: null };
+  }
+}
+
+// Process personas in waves bounded by the lim concurrency cap. Each wave:
+// provision (1s apart, requested) → run agents → free the sims for the next wave.
+const keep = process.argv.includes('--keep');
+const waves: Unit[][] = [];
+for (let i = 0; i < units.length; i += MAX_SIMS) waves.push(units.slice(i, i + MAX_SIMS));
+const results: Array<{ ok: boolean; rating: number | null }> = [];
+for (let w = 0; w < waves.length; w += 1) {
+  const wave = waves[w] as Unit[];
+  if (w > 0) await clearCap();
+  console.log(`▶ wave ${w + 1}/${waves.length}: provisioning ${wave.length} simulators…`);
+  for (const u of wave) {
+    try {
+      const out = await lim(['ios', 'create', '--attach']);
+      u.iosId = out.match(/ID:\s*(ios_[a-z0-9_]+)/i)?.[1] ?? '';
+    } catch (e) {
+      console.error(`  provision failed ${u.spec.display_name}:`, (e as Error).message.slice(0, 60));
+    }
+    if (u.iosId) {
+      // Foreground OUR app so the agent tests it, not the iOS home screen.
+      await lim(['ios', 'launch-app', 'com.limrun.sample-native', '--id', u.iosId]).catch(() => {});
+      u.simulator = { ...u.simulator, lim_handle: u.iosId, status: 'live' };
+      await writer.upsertSimulator(u.simulator);
+    } else {
+      await writer.upsertSimulator({ ...u.simulator, status: 'down' });
+      await writer.upsertPersona({ ...u.persona, status: 'crashed' });
+    }
+    console.log(`  ${u.spec.display_name} → ${u.iosId || 'FAILED'}`);
+    await sleep(1000); // 1s delay between creates (requested; avoids transient 403s)
+  }
+  results.push(
+    ...(await Promise.all(wave.map((u) => (u.iosId ? runUnit(u) : Promise.resolve({ ok: false, rating: null as number | null }))))),
+  );
+  const isLast = w === waves.length - 1;
+  if (!isLast || !keep) for (const u of wave) if (u.iosId) await lim(['ios', 'delete', u.iosId]).catch(() => {});
+}
 
 const ratings = results.filter((r) => r.ok && r.rating != null).map((r) => r.rating as number);
 const swarmRating = ratings.length ? Math.round((ratings.reduce((a, b) => a + b, 0) / ratings.length) * 10) / 10 : null;
 await writer.upsertRun({ ...run, status: 'converged', swarm_rating: swarmRating, converged_at: now() });
 console.log(`▶ converged — Swarm Rating ${swarmRating}/5. Report: http://localhost:3000/r/${runId}`);
-
-// Teardown (cost guardrail). Comment out to keep sims for live frame viewing.
-const keep = process.argv.includes('--keep');
-if (!keep) {
-  for (const u of units) if (u.iosId) await lim(['ios', 'delete', u.iosId]).catch(() => {});
-  console.log('▶ simulators torn down (use --keep to leave them up for live-frame viewing).');
-}

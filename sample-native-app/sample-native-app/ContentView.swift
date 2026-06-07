@@ -1,10 +1,11 @@
 //
 //  ContentView.swift — The AI Beta-Tester Swarm demo app (App-Under-Test)
 //
-//  A Notes/Tasks app (Epic 4, FR-11). Screen names match the swarm's finding
-//  templates: NoteList, NoteDetail, Search. It deliberately carries a few
-//  realistic, reproducible UI/UX edge cases for the swarm to discover (marked
-//  `SEEDED EDGE CASE`). Kept believable — not obviously staged (SM-C2).
+//  A richer Notes / Tasks / Settings app (Epic 4, FR-11) so the swarm has real
+//  surface to explore and produce detailed reports. Screen names match the
+//  finding templates: NoteList, NoteDetail, Search, Tasks, Settings. It carries
+//  realistic, reproducible UI/UX edge cases (marked `SEEDED`) across the battery —
+//  believable, not obviously staged (SM-C2).
 //
 
 import SwiftUI
@@ -14,123 +15,170 @@ struct Note: Identifiable, Equatable, Hashable {
     let id = UUID()
     var title: String
     var body: String
+    var tag: String = "General"
 }
 
-final class NotesStore: ObservableObject {
-    @Published var notes: [Note] = []   // SEEDED empty_state: starts empty
+struct Task: Identifiable, Equatable, Hashable {
+    let id = UUID()
+    var title: String
+    var done: Bool = false
+}
 
-    func add() {
-        notes.insert(Note(title: "", body: ""), at: 0)
-    }
+final class AppStore: ObservableObject {
+    @Published var notes: [Note] = []        // SEEDED empty_state: starts empty
+    @Published var tasks: [Task] = []
+    @Published var signedIn = true
+    @Published var syncing = false
 
-    func seedLargeData() {
-        notes = (1...10_000).map { Note(title: "Note \($0)", body: "Body for note \($0)") }
-    }
-
-    func delete(_ note: Note) {
-        notes.removeAll { $0.id == note.id }
-    }
+    func addNote() { notes.insert(Note(title: "", body: ""), at: 0) }
+    func seedLargeData() { notes = (1...10_000).map { Note(title: "Note \($0)", body: "Body for note number \($0) with some content.") } }
+    func deleteNote(_ n: Note) { notes.removeAll { $0.id == n.id } }
+    func addTask(_ t: String) { if !t.isEmpty { tasks.append(Task(title: t)) } }
+    func clearCompleted() { tasks.removeAll { $0.done } }
 }
 
 struct ContentView: View {
-    @StateObject private var store = NotesStore()
-
+    @StateObject private var store = AppStore()
     var body: some View {
-        NoteListScreen()
-            .environmentObject(store)
+        TabView {
+            NotesTab().tabItem { Label("Notes", systemImage: "note.text") }
+            TasksTab().tabItem { Label("Tasks", systemImage: "checklist") }
+            SettingsTab().tabItem { Label("Settings", systemImage: "gearshape") }
+        }
+        .environmentObject(store)
     }
 }
 
-struct NoteListScreen: View {
-    @EnvironmentObject var store: NotesStore
+// MARK: - Notes
+struct NotesTab: View {
+    @EnvironmentObject var store: AppStore
     @State private var query = ""
 
     var filtered: [Note] {
         query.isEmpty ? store.notes : store.notes.filter {
-            $0.title.localizedCaseInsensitiveContains(query) ||
-            $0.body.localizedCaseInsensitiveContains(query)
+            $0.title.localizedCaseInsensitiveContains(query) || $0.body.localizedCaseInsensitiveContains(query)
         }
     }
 
     var body: some View {
         NavigationStack {
-            // SEEDED empty_state: when there are no notes we render a blank list
-            // with no guidance/CTA (a real first-run pitfall).
+            // SEEDED empty_state: a blank list with no guidance/CTA on first run.
             List {
                 ForEach(filtered) { note in
                     NavigationLink(value: note) {
-                        // SEEDED long_name_rtl: title is hard-clipped to a fixed
-                        // width — long titles cut with no helpful affordance.
-                        Text(note.title.isEmpty ? "Untitled" : note.title)
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                            .frame(maxWidth: 240, alignment: .leading)
-                            .clipped()
+                        VStack(alignment: .leading, spacing: 2) {
+                            // SEEDED long_name_rtl: title hard-clipped at a fixed width.
+                            Text(note.title.isEmpty ? "Untitled" : note.title)
+                                .font(.headline)
+                                .lineLimit(1)
+                                .frame(maxWidth: 240, alignment: .leading)
+                                .clipped()
+                            // SEEDED overflow: preview can run past the row.
+                            Text(note.body).font(.subheadline).foregroundStyle(.secondary).lineLimit(1)
+                        }
                     }
                 }
             }
             .navigationTitle("Notes")
-            .searchable(text: $query, prompt: "Search")   // Search screen
-            .navigationDestination(for: Note.self) { note in
-                NoteDetailScreen(note: note)
-            }
+            .searchable(text: $query, prompt: "Search notes")
+            .navigationDestination(for: Note.self) { NoteDetailView(note: $0) }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    // SEEDED rapid_tap: no debounce — a fast double-tap adds two notes.
-                    Button {
-                        store.add()
-                    } label: {
-                        Image(systemName: "plus")   // SEEDED accessibility: no label
-                    }
-                    .accessibilityIdentifier("new-note")
+                    // SEEDED rapid_tap: no debounce — double-tap creates duplicates.
+                    Button { store.addNote() } label: { Image(systemName: "plus") } // SEEDED accessibility: no label
+                        .accessibilityIdentifier("new-note")
                 }
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Seed 10k") { store.seedLargeData() }   // large_data
+                    Button("Seed 10k") { store.seedLargeData() } // SEEDED large_data
                 }
             }
         }
     }
 }
 
-struct NoteDetailScreen: View {
-    @EnvironmentObject var store: NotesStore
+struct NoteDetailView: View {
+    @EnvironmentObject var store: AppStore
     @Environment(\.dismiss) private var dismiss
     @State var note: Note
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            TextField("Title", text: $note.title)
-                .font(.title2)
+            TextField("Title", text: $note.title).font(.title2)
+            TextField("Tag", text: $note.tag).font(.subheadline).foregroundStyle(.secondary)
             Divider()
             TextEditor(text: $note.body)
-
-            // SEEDED tiny_screen: actions in a fixed-width HStack that can overflow
-            // / overlap on the smallest devices.
+            // SEEDED tiny_screen: fixed-width action row overflows small devices.
             HStack {
-                Button("Save") { saveAndClose() }
-                    .buttonStyle(.borderedProminent)
+                Button("Save") { save() }.buttonStyle(.borderedProminent)
                 Spacer(minLength: 0)
-                Button("Delete", role: .destructive) {
-                    store.delete(note)
-                    dismiss()
-                }
-                .buttonStyle(.bordered)
+                Button("Delete", role: .destructive) { store.deleteNote(note); dismiss() }.buttonStyle(.bordered)
             }
-            .frame(minWidth: 420)   // wider than small screens => clipping
+            .frame(minWidth: 420)
         }
         .padding()
-        .navigationTitle("Edit")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("Edit").navigationBarTitleDisplayMode(.inline)
     }
-
-    private func saveAndClose() {
-        if let i = store.notes.firstIndex(where: { $0.id == note.id }) {
-            store.notes[i] = note
-        }
+    private func save() {
+        if let i = store.notes.firstIndex(where: { $0.id == note.id }) { store.notes[i] = note }
         dismiss()
     }
 }
 
-#Preview {
-    ContentView()
+// MARK: - Tasks
+struct TasksTab: View {
+    @EnvironmentObject var store: AppStore
+    @State private var newTask = ""
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                HStack {
+                    TextField("New task", text: $newTask)
+                    // SEEDED accessibility: icon-only add with no label.
+                    Button { store.addTask(newTask); newTask = "" } label: { Image(systemName: "plus.circle.fill") }
+                }.padding()
+                List {
+                    ForEach($store.tasks) { $task in
+                        HStack {
+                            Button { task.done.toggle() } label: {
+                                Image(systemName: task.done ? "checkmark.circle.fill" : "circle")
+                            }.buttonStyle(.plain)
+                            Text(task.title).strikethrough(task.done).foregroundStyle(task.done ? .secondary : .primary)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Tasks")
+            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Clear done") { store.clearCompleted() } } }
+        }
+    }
 }
+
+// MARK: - Settings (auth / sync edge cases)
+struct SettingsTab: View {
+    @EnvironmentObject var store: AppStore
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Account") {
+                    HStack { Text("Status"); Spacer(); Text(store.signedIn ? "Signed in" : "Signed out").foregroundStyle(.secondary) }
+                    // SEEDED auth_expiry: "sign out" then any sync shows a raw error path.
+                    Button(store.signedIn ? "Sign out" : "Sign in") { store.signedIn.toggle() }
+                }
+                Section("Sync") {
+                    // SEEDED slow_network: sync spins with no timeout/feedback.
+                    Button { store.syncing = true } label: {
+                        HStack { Text("Sync now"); if store.syncing { Spacer(); ProgressView() } }
+                    }
+                }
+                Section("Data") {
+                    Button("Seed 10,000 notes") { store.seedLargeData() }
+                    Button("Delete all notes", role: .destructive) { store.notes.removeAll() }
+                }
+            }
+            .navigationTitle("Settings")
+        }
+    }
+}
+
+#Preview { ContentView() }
