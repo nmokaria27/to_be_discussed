@@ -25,7 +25,7 @@ export default function Dashboard({ timeline }: { timeline: TimedEvent[] }) {
       finished={finished}
       modeTag="fixture replay"
       plannedCount={plannedCount}
-      primaryLabel={finished ? '↻ Run again' : '⚡ Unleash Swarm'}
+      primaryLabel={finished ? 'Run again' : 'Unleash Swarm'}
       onPrimary={start}
       onStop={reset}
       speed={speed}

@@ -543,3 +543,31 @@ So that we are confident on stage and on the rubric.
 **When** we rehearse
 **Then** at least 3 consecutive demo runs complete cleanly within the window (SM-1)
 **And** the `hackathon-judge` skill is run on the built product and its originality verdict is favorable or its gaps are addressed (SM-5).
+
+---
+
+## Epic 7: Beta-test websites too (Playwright)
+
+Extend the swarm beyond mobile: the same persona agents test **web apps** via a
+Playwright-driven `WebDriver`, surfacing findings in the same Edge-Case Battery
+vocabulary. Same `DriverAgent` (C7) seam → no change to PersonaAgent/orchestrator/UI.
+
+### Story 7.1: Web defect analyzer — **[Owner: Claude] ✅ DONE**
+As the swarm, I want to turn a captured web page snapshot into edge-case findings,
+so a web app gets the same treatment as a mobile app.
+**Acceptance Criteria:**
+**Given** a page snapshot (nodes, title, lang, console errors)
+**When** `detectWebDefects` runs
+**Then** it flags images without alt, controls without an accessible name, missing
+`lang`, blank/empty render, and network/console errors — each as a battery-classed
+DefectHint. **(6 tests passing.)**
+
+### Story 7.2: Playwright WebDriver — **[Owner: Claude] ✅ DONE (real run needs `playwright` installed)**
+As a persona agent, I want to drive a real website,
+so I can explore and capture findings like I do on a simulator.
+**Acceptance Criteria:**
+**Given** a target URL
+**When** the `WebDriver` observes
+**Then** it navigates via Playwright, captures a screenshot + a11y snapshot +
+console errors, and feeds `detectWebDefects` — implementing the same `DriverAgent`
+interface as `LimDriver`/`FakeDriver` (Playwright imported lazily).

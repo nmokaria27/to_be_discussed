@@ -47,7 +47,7 @@ export default function LiveDashboard() {
       finished={finished}
       modeTag="live · InsForge"
       plannedCount={SWARM_SIZE}
-      primaryLabel={launching ? 'launching…' : finished ? '↻ Run again' : '⚡ Unleash Swarm'}
+      primaryLabel={launching ? 'Launching…' : finished ? 'Run again' : 'Unleash Swarm'}
       onPrimary={finished ? () => setRunId(null) : unleash}
     />
   );
